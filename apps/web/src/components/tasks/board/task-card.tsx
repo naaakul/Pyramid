@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useBoardFieldsStore, isMembersVisible } from '@/store/board-fields-store';
 import type { ApiTask } from '@/lib/api/tasks';
+import { PriorityBadge } from '../shared/priority-badge';
 
 export function TaskCard({ task }: { task: ApiTask }) {
   const { visible } = useBoardFieldsStore();
@@ -39,11 +40,7 @@ export function TaskCard({ task }: { task: ApiTask }) {
         </div>
       )}
 
-      {visible.priority && (
-        <Badge variant="outline" className="w-fit text-[11px] px-1.5 py-0">
-          {task.priority.replace('_', ' ')}
-        </Badge>
-      )}
+      {visible.priority && <PriorityBadge priority={task.priority} />}
 
       {visible.labels && task.labels.length > 0 && (
         <div className="flex flex-wrap gap-1">

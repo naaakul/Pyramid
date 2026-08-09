@@ -4,12 +4,14 @@ import { KanbanBoard } from '@/components/tasks/board/kanban-board';
 import { TaskListView } from '@/components/tasks/list/task-list';
 import { FieldsPopover } from '@/components/tasks/fields-popover';
 
-export default function TasksPage({
+export default async function TasksPage({
   searchParams,
 }: {
-  searchParams: { view?: string };
+  searchParams: Promise<{ view?: string }>;
 }) {
-  const view = searchParams.view === 'list' ? 'list' : 'board';
+  const params = await searchParams;
+
+  const view = params.view === 'list' ? 'list' : 'board';
 
   return (
     <div>
