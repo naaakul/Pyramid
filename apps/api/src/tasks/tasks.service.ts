@@ -35,6 +35,10 @@ export class TasksService {
         ...(query.assigneeId && {
           assignees: { some: { userId: query.assigneeId } },
         }),
+        ...(query.labelId && { labels: { some: { labelId: query.labelId } } }),
+        ...(query.reporterId && { reporterId: query.reporterId }),
+        ...(query.dueDate === 'overdue' && { dueDateEnd: { lt: new Date() } }),
+        ...(query.dueDate === 'no_date' && { dueDateEnd: null }),
       },
       include: TASK_INCLUDE,
       orderBy: { position: 'asc' },
