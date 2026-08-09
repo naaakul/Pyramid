@@ -4,30 +4,25 @@ import { useStatuses, useTasks } from '@/hooks/use-tasks';
 import { useBoardFieldsStore } from '@/store/board-fields-store';
 import { getVisibleColumns } from '../shared/column-defs';
 import { TaskGroup } from './task-group';
+import type { TaskQuery } from '@/lib/api/tasks';
 
-export function TaskListView({ search }: { search?: string }) {
+export function TaskListView({ query }: { query: TaskQuery }) {
   const { data: statuses, isLoading: statusesLoading } = useStatuses();
-  const { data: tasks, isLoading: tasksLoading } = useTasks(search);
+  const { data: tasks, isLoading: tasksLoading } = useTasks(query);
   const visible = useBoardFieldsStore((s) => s.visible);
   const columns = getVisibleColumns(visible);
 
-  if (statusesLoading || tasksLoading) {
-    return <div className="p-6 text-sm text-gray-500">Loading...</div>;
-  }
+  if (statusesLoading || tasksLoading) return <div className="p-6 text-sm text-gray-500">Loading...</div>;
 
   const groups = (statuses ?? []).map((status) => ({
     status,
     tasks: (tasks ?? []).filter((t) => t.statusId === status.id),
   }));
+  const hasActiveFilter = Object.values(query).some(Boolean);
+  const visibleGroups = hasActiveFilter ? groups.filter((g) => g.tasks.length > 0) : groups;
 
-  const visibleGroups = search ? groups.filter((g) => g.tasks.length > 0) : groups;
-
-  if (search && visibleGroups.length === 0) {
-    return (
-      <div className="px-6 py-16 text-center text-sm text-gray-400">
-        No tasks match &quot;{search}&quot;
-      </div>
-    );
+  if (hasActiveFilter && visibleGroups.length === 0) {
+    return <div className="px-6 py-16 text-center text-sm text-gray-400">No tasks match these filters</div>;
   }
 
   return (

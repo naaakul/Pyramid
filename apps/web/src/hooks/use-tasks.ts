@@ -7,13 +7,20 @@ import {
   updateTask,
   addComment,
   createTask,
+  getTeams,
+  type TaskQuery,
   type ApiTaskDetail,
 } from "@/lib/api/tasks";
+import {} from "@/lib/api/tasks";
 
 export const useStatuses = () =>
   useQuery({ queryKey: ["statuses"], queryFn: getStatuses });
-export const useTasks = (search?: string) =>
-  useQuery({ queryKey: ["tasks", search], queryFn: () => getTasks(search) });
+
+export const useTasks = (query: TaskQuery = {}) =>
+  useQuery({ queryKey: ["tasks", query], queryFn: () => getTasks(query) });
+
+export const useTeams = () =>
+  useQuery({ queryKey: ["teams"], queryFn: getTeams });
 
 export function useCreateTask() {
   const qc = useQueryClient();
@@ -53,4 +60,42 @@ export function useCreateSubtask(parentTaskId: string) {
       createTask({ ...data, parentTaskId }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["task", parentTaskId] }),
   });
+}
+
+import {
+  getLabels,
+  createLabel,
+  getWorkspaceMembers,
+  addAssignee,
+  removeAssignee,
+} from "@/lib/api/tasks";
+
+export const useLabels = () =>
+  useQuery({ queryKey: ["labels"], queryFn: getLabels });
+export const useWorkspaceMembers = () =>
+  useQuery({ queryKey: ["workspace-members"], queryFn: getWorkspaceMembers });
+
+export function useCreateLabel() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: createLabel,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["labels"] }),
+  });
+}
+
+export function useToggleAssignee(taskId: string) {
+  const qc = useQueryClient();
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["task", taskId] });
+    qc.invalidateQueries({ queryKey: ["tasks"] });
+  };
+  const add = useMutation({
+    mutationFn: (userId: string) => addAssignee(taskId, userId),
+    onSuccess: invalidate,
+  });
+  const remove = useMutation({
+    mutationFn: (userId: string) => removeAssignee(taskId, userId),
+    onSuccess: invalidate,
+  });
+  return { add, remove };
 }

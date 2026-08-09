@@ -1,5 +1,15 @@
 import { apiFetch } from "./client";
 
+export interface TaskQuery {
+  search?: string;
+  statusId?: string;
+  priority?: string;
+  assigneeId?: string;
+  labelId?: string;
+  reporterId?: string;
+  dueDate?: 'overdue' | 'no_date';
+}
+
 export interface ApiUser {
   id: string;
   name: string;
@@ -44,6 +54,7 @@ export interface ApiActivity {
 
 export interface ApiTaskDetail extends ApiTask {
   description: string | null;
+  dueDateStart: string | null;
   status: ApiStatus;
   reporter: ApiUser;
   subtasks: ApiTask[];
@@ -56,7 +67,15 @@ export const getTask = (id: string) => apiFetch<ApiTaskDetail>(`/tasks/${id}`);
 
 export const updateTask = (
   id: string,
-  data: Partial<{ priority: string; statusId: string; title: string }>,
+  data: Partial<{
+    priority: string;
+    statusId: string;
+    title: string;
+    description: string;
+    dueDateStart: string | null;
+    dueDateEnd: string | null;
+    labelIds: string[];
+  }>,
 ) =>
   apiFetch<ApiTask>(`/tasks/${id}`, {
     method: "PATCH",
@@ -78,10 +97,17 @@ export const createTask = (data: {
 
 export const getStatuses = () => apiFetch<ApiStatus[]>("/statuses");
 
-export const getTasks = (search?: string) =>
-  apiFetch<ApiTask[]>(
-    `/tasks${search ? `?search=${encodeURIComponent(search)}` : ""}`,
-  );
+export const getTasks = (query: TaskQuery = {}) => {
+  const params = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (value) params.set(key, value);
+  });
+  const qs = params.toString();
+  return apiFetch<ApiTask[]>(`/tasks${qs ? `?${qs}` : ''}`);
+};
+
+export interface ApiTeam { id: string; name: string; }
+export const getTeams = () => apiFetch<ApiTeam[]>('/teams');
 
 export const moveTask = (
   id: string,
@@ -90,4 +116,27 @@ export const moveTask = (
   apiFetch<ApiTask>(`/tasks/${id}/position`, {
     method: "PATCH",
     body: JSON.stringify(data),
+  });
+
+export interface ApiLabelFull {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export const getLabels = () => apiFetch<ApiLabelFull[]>("/labels");
+export const createLabel = (name: string) =>
+  apiFetch<ApiLabelFull>("/labels", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+
+export const getWorkspaceMembers = () =>
+  apiFetch<ApiUser[]>("/workspaces/members");
+
+export const addAssignee = (taskId: string, userId: string) =>
+  apiFetch<ApiTask>(`/tasks/${taskId}/assignees/${userId}`, { method: "POST" });
+export const removeAssignee = (taskId: string, userId: string) =>
+  apiFetch<ApiTask>(`/tasks/${taskId}/assignees/${userId}`, {
+    method: "DELETE",
   });

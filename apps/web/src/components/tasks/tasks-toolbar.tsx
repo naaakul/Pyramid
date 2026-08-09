@@ -1,17 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from './search-bar';
 import { FieldsPopover } from './fields-popover';
+import { FilterMenu } from './filter-menu';
 import { KanbanBoard } from './board/kanban-board';
 import { TaskListView } from './list/task-list';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
+import { useTaskFiltersStore } from '@/store/task-filters-store';
+import type { TaskQuery } from '@/lib/api/tasks';
 
-export function TasksToolbar({ initialView }: { initialView: 'list' | 'board' }) {
+export function TasksToolbar({
+  initialView,
+  projectId,
+}: {
+  initialView: 'list' | 'board';
+  projectId?: string;
+}) {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 300);
+  const filters = useTaskFiltersStore((s) => s.filters);
+
+  const query: TaskQuery = {
+    search: debouncedSearch,
+    ...filters,
+    ...(projectId && { projectId }),
+  };
 
   return (
     <div>
@@ -20,15 +35,11 @@ export function TasksToolbar({ initialView }: { initialView: 'list' | 'board' })
         <div className="flex items-center gap-2">
           <SearchBar value={search} onChange={setSearch} />
           <FieldsPopover />
-          <Button variant="outline" size="icon"><SlidersHorizontal size={16} /></Button>
+          <FilterMenu />
           <Button size="sm" className="bg-black text-white hover:bg-gray-800">+ Add Task</Button>
         </div>
       </div>
-      {initialView === 'list' ? (
-        <TaskListView search={debouncedSearch} />
-      ) : (
-        <KanbanBoard search={debouncedSearch} />
-      )}
+      {initialView === 'list' ? <TaskListView query={query} /> : <KanbanBoard query={query} />}
     </div>
   );
 }
