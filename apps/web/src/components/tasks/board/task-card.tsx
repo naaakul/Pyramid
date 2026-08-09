@@ -7,13 +7,16 @@ import { Badge } from '@/components/ui/badge';
 import { useBoardFieldsStore, isMembersVisible } from '@/store/board-fields-store';
 import type { ApiTask } from '@/lib/api/tasks';
 import { PriorityBadge } from '../shared/priority-badge';
+import Link from 'next/link';
 
 export function TaskCard({ task }: { task: ApiTask }) {
   const { visible } = useBoardFieldsStore();
   const assignee = task.assignees[0]?.user;
 
   return (
-    <Card className="p-3 gap-2 shadow-none border-gray-200">
+    <Link href={`/tasks/${task.id}`} className="block">
+
+    <Card className="p-3 gap-2 shadow-none border-gray-200 hover:border-gray-300">
       <div className="flex items-start justify-between">
         <p className="text-sm font-medium">{task.title}</p>
         <MoreHorizontal size={16} className="text-gray-400 shrink-0" />
@@ -53,5 +56,7 @@ export function TaskCard({ task }: { task: ApiTask }) {
         </div>
       )}
     </Card>
+    </Link>
+
   );
 }

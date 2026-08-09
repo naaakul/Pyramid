@@ -1,11 +1,11 @@
-import { Signal, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
+import { Minus, SignalLow, SignalMedium, SignalHigh } from 'lucide-react';
 
-const PRIORITY_CONFIG: Record<string, { icon: typeof Signal; color: string; label: string }> = {
-  NO_PRIORITY: { icon: Signal, color: 'text-gray-400', label: 'No Priority' },
+export const PRIORITY_CONFIG: Record<string, { icon: typeof Minus; color: string; label: string }> = {
+  NO_PRIORITY: { icon: Minus, color: 'text-gray-400', label: 'No Priority' },
   LOW: { icon: SignalLow, color: 'text-gray-400', label: 'Low' },
   MEDIUM: { icon: SignalMedium, color: 'text-orange-500', label: 'Medium' },
   HIGH: { icon: SignalHigh, color: 'text-red-500', label: 'High' },
-  URGENT: { icon: SignalHigh, color: 'text-red-700 font-medium', label: 'Urgent' },
+  URGENT: { icon: SignalHigh, color: 'text-slate-900 font-semibold', label: 'Urgent' },
 };
 
 export function PriorityBadge({ priority }: { priority: string }) {
