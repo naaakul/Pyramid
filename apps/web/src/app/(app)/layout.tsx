@@ -1,0 +1,25 @@
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { getCurrentUser } from '@/lib/api/auth';
+import { AppSidebar } from '@/components/sidebar/app-sidebar';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { Separator } from '@/components/ui/separator';
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const user = await getCurrentUser(cookieStore.toString());
+  if (!user) redirect('/login');
+
+  return (
+    <SidebarProvider>
+      <AppSidebar user={user} />
+      <SidebarInset>
+        <header className="flex h-12 items-center gap-2 px-4 border-b">
+          <SidebarTrigger />
+          <Separator orientation="vertical" className="h-4" />
+        </header>
+        <div className="flex-1">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
