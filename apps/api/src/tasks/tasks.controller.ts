@@ -53,4 +53,27 @@ export class TasksController {
   @Delete(':id') remove(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     return this.tasksService.remove(u.workspaceId, id);
   }
+
+  @Post(':id/assignees/:userId')
+  addAssignee(
+    @CurrentUser() u: AuthUser,
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.tasksService.addAssignee(u.workspaceId, id, userId, u.userId);
+  }
+
+  @Delete(':id/assignees/:userId')
+  removeAssignee(
+    @CurrentUser() u: AuthUser,
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.tasksService.removeAssignee(
+      u.workspaceId,
+      id,
+      userId,
+      u.userId,
+    );
+  }
 }

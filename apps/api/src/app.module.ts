@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { StatusesModule } from './statuses/statuses.module';
 import { TasksModule } from './tasks/tasks.module';
 import { CommentsModule } from './comments/comments.module';
+import { LabelsModule } from './labels/labels.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 
 @Module({
   imports: [
@@ -13,7 +15,9 @@ import { CommentsModule } from './comments/comments.module';
     AuthModule,
     StatusesModule,
     TasksModule,
-    CommentsModule
+    CommentsModule,
+    LabelsModule,
+    WorkspacesModule
   ],
 })
 export class AppModule {}

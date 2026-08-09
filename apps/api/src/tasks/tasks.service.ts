@@ -183,4 +183,44 @@ export class TasksService {
     });
     if (!task) throw new NotFoundException('Task not found');
   }
+
+  async addAssignee(
+    workspaceId: string,
+    taskId: string,
+    userId: string,
+    actorId: string,
+  ) {
+    await this.ensureExists(workspaceId, taskId);
+    await this.prisma.taskAssignee.upsert({
+      where: { taskId_userId: { taskId, userId } },
+      create: { taskId, userId },
+      update: {},
+    });
+    await this.activityService.log(
+      taskId,
+      actorId,
+      ActivityType.ASSIGNEE_ADDED,
+      undefined,
+      userId,
+    );
+    return this.findOne(workspaceId, taskId);
+  }
+
+  async removeAssignee(
+    workspaceId: string,
+    taskId: string,
+    userId: string,
+    actorId: string,
+  ) {
+    await this.ensureExists(workspaceId, taskId);
+    await this.prisma.taskAssignee.deleteMany({ where: { taskId, userId } });
+    await this.activityService.log(
+      taskId,
+      actorId,
+      ActivityType.ASSIGNEE_REMOVED,
+      userId,
+      undefined,
+    );
+    return this.findOne(workspaceId, taskId);
+  }
 }
