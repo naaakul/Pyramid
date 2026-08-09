@@ -1,0 +1,270 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Priority {
+  NO_PRIORITY
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ThemeMode {
+  LIGHT
+  DARK
+}
+
+enum ColorMode {
+  AMBER
+  BLUE
+  PINK
+  ROSE
+  EMERALD
+  BLACK
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  GUEST
+}
+
+enum ActivityType {
+  STATUS_CHANGED
+  PRIORITY_CHANGED
+  ASSIGNEE_ADDED
+  ASSIGNEE_REMOVED
+  DUE_DATE_CHANGED
+  COMMENT_ADDED
+  UPDATE_POSTED
+}
+
+model User {
+  id          String  @id @default(cuid())
+  email       String? @unique
+  name        String
+  username    String? @unique
+  title       String?
+  avatarColor String?
+  avatarUrl   String?
+
+  isGuest      Boolean @default(false)
+  googleId     String? @unique
+  passwordHash String?
+
+  themeMode ThemeMode @default(LIGHT)
+  colorMode ColorMode @default(BLACK)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships      WorkspaceMember[]
+  reportedTasks    Task[]            @relation("TaskReporter")
+  assignedTasks    TaskAssignee[]
+  ledProjects      Project[]         @relation("ProjectLead")
+  comments         Comment[]
+  activities       Activity[]
+  attachmentsAdded Attachment[]
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  ownerId   String
+  createdAt DateTime @default(now())
+
+  members  WorkspaceMember[]
+  projects Project[]
+  tasks    Task[]
+  labels   Label[]
+  teams    Team[]
+  statuses Status[]
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+}
+
+model Status {
+  id          String @id @default(cuid())
+  workspaceId String
+  name        String
+  color       String @default("#94a3b8")
+  order       Int
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId, order])
+}
+
+model Label {
+  id          String @id @default(cuid())
+  workspaceId String
+  name        String
+  color       String @default("#64748b")
+
+  workspace Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tasks     TaskLabel[]
+
+  @@unique([workspaceId, name])
+}
+
+model Team {
+  id          String @id @default(cuid())
+  workspaceId String
+  name        String
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tasks     TaskTeam[]
+
+  @@unique([workspaceId, name])
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  workspaceId String
+  name        String
+  priority    Priority  @default(NO_PRIORITY)
+  leadId      String?
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  lead      User?     @relation("ProjectLead", fields: [leadId], references: [id])
+  tasks     Task[]
+
+  @@index([workspaceId])
+}
+
+model Task {
+  id           String  @id @default(cuid())
+  workspaceId  String
+  projectId    String?
+  parentTaskId String?
+  statusId     String
+  reporterId   String
+
+  title        String
+  description  String?
+  priority     Priority  @default(NO_PRIORITY)
+  dueDateStart DateTime?
+  dueDateEnd   DateTime?
+  position     Float     @default(0)
+  watcherCount Int       @default(0)
+  isLocked     Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project   Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  status    Status    @relation(fields: [statusId], references: [id])
+  reporter  User      @relation("TaskReporter", fields: [reporterId], references: [id])
+
+  parentTask Task?  @relation("Subtasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  subtasks   Task[] @relation("Subtasks")
+
+  assignees   TaskAssignee[]
+  labels      TaskLabel[]
+  teams       TaskTeam[]
+  comments    Comment[]
+  attachments Attachment[]
+  activities  Activity[]
+
+  @@index([workspaceId, statusId])
+  @@index([projectId])
+  @@index([parentTaskId])
+}
+
+model TaskAssignee {
+  taskId     String
+  userId     String
+  assignedAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+}
+
+model TaskLabel {
+  taskId  String
+  labelId String
+
+  task  Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, labelId])
+}
+
+model TaskTeam {
+  taskId String
+  teamId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, teamId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  taskId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id])
+
+  @@index([taskId])
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  taskId    String
+  addedById String
+  name      String
+  url       String
+  type      String?
+  createdAt DateTime @default(now())
+
+  task    Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  addedBy User @relation(fields: [addedById], references: [id])
+
+  @@index([taskId])
+}
+
+model Activity {
+  id        String       @id @default(cuid())
+  taskId    String
+  actorId   String
+  type      ActivityType
+  fromValue String?
+  toValue   String?
+  createdAt DateTime     @default(now())
+
+  task  Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@index([taskId, createdAt])
+}
