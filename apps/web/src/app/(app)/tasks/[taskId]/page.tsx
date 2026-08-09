@@ -12,9 +12,14 @@ async function fetchTask(taskId: string, cookieHeader: string) {
   return res.json();
 }
 
-export default async function TaskDetailPage({ params }: { params: { taskId: string } }) {
+export default async function TaskDetailPage({
+  params,
+}: {
+  params: Promise<{ taskId: string }>;
+}) {
+  const { taskId } = await params;
   const cookieStore = await cookies();
-  const task = await fetchTask(params.taskId, cookieStore.toString());
+  const task = await fetchTask(taskId, cookieStore.toString());
   if (!task) notFound();
-  return <TaskDetailClient initialTask={task} taskId={params.taskId} />;
+  return <TaskDetailClient initialTask={task} taskId={taskId} />;
 }

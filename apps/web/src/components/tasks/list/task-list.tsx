@@ -1,11 +1,15 @@
 'use client';
 
 import { useStatuses, useTasks } from '@/hooks/use-tasks';
+import { useBoardFieldsStore } from '@/store/board-fields-store';
+import { getVisibleColumns } from '../shared/column-defs';
 import { TaskGroup } from './task-group';
 
 export function TaskListView({ search }: { search?: string }) {
   const { data: statuses, isLoading: statusesLoading } = useStatuses();
   const { data: tasks, isLoading: tasksLoading } = useTasks(search);
+  const visible = useBoardFieldsStore((s) => s.visible);
+  const columns = getVisibleColumns(visible);
 
   if (statusesLoading || tasksLoading) {
     return <div className="p-6 text-sm text-gray-500">Loading...</div>;
@@ -29,7 +33,7 @@ export function TaskListView({ search }: { search?: string }) {
   return (
     <div className="px-6 pb-6">
       {visibleGroups.map(({ status, tasks }) => (
-        <TaskGroup key={status.id} status={status} tasks={tasks} />
+        <TaskGroup key={status.id} status={status} tasks={tasks} columns={columns} />
       ))}
     </div>
   );

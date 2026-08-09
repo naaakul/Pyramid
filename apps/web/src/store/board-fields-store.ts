@@ -20,14 +20,14 @@ interface BoardFieldsState {
 
 export const useBoardFieldsStore = create<BoardFieldsState>((set) => ({
   visible: {
-    priority: false,
-    members: true,
-    dueDate: false,
-    members2: true,
-    labels: false,
-    status: false,
-    reporter: false,
-  },
+  priority: true,
+  members: true,
+  dueDate: true,
+  members2: true,
+  labels: false,
+  status: false,
+  reporter: false,
+},
   toggle: (key) =>
     set((state) => ({ visible: { ...state.visible, [key]: !state.visible[key] } })),
 }));
