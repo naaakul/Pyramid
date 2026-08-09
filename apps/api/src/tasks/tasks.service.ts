@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ActivityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ActivityService } from '../activity/activity.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { QueryTasksDto } from './dto/query-tasks.dto';
@@ -14,18 +16,25 @@ const TASK_INCLUDE = {
 
 @Injectable()
 export class TasksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private activityService: ActivityService,
+  ) {}
 
   findAll(workspaceId: string, query: QueryTasksDto) {
     return this.prisma.task.findMany({
       where: {
         workspaceId,
         parentTaskId: null,
-        ...(query.search && { title: { contains: query.search, mode: 'insensitive' as const } }),
+        ...(query.search && {
+          title: { contains: query.search, mode: 'insensitive' as const },
+        }),
         ...(query.statusId && { statusId: query.statusId }),
         ...(query.priority && { priority: query.priority }),
         ...(query.projectId && { projectId: query.projectId }),
-        ...(query.assigneeId && { assignees: { some: { userId: query.assigneeId } } }),
+        ...(query.assigneeId && {
+          assignees: { some: { userId: query.assigneeId } },
+        }),
       },
       include: TASK_INCLUDE,
       orderBy: { position: 'asc' },
@@ -40,7 +49,10 @@ export class TasksService {
         subtasks: { include: TASK_INCLUDE },
         comments: { include: { author: true }, orderBy: { createdAt: 'asc' } },
         attachments: true,
-        activities: { include: { actor: true }, orderBy: { createdAt: 'desc' } },
+        activities: {
+          include: { actor: true },
+          orderBy: { createdAt: 'desc' },
+        },
         reporter: true,
       },
     });
@@ -55,7 +67,8 @@ export class TasksService {
         where: { workspaceId },
         orderBy: { order: 'asc' },
       });
-      if (!defaultStatus) throw new NotFoundException('No statuses configured for workspace');
+      if (!defaultStatus)
+        throw new NotFoundException('No statuses configured for workspace');
       statusId = defaultStatus.id;
     }
 
@@ -80,27 +93,73 @@ export class TasksService {
         assignees: dto.assigneeIds
           ? { create: dto.assigneeIds.map((userId) => ({ userId })) }
           : undefined,
-        labels: dto.labelIds ? { create: dto.labelIds.map((labelId) => ({ labelId })) } : undefined,
+        labels: dto.labelIds
+          ? { create: dto.labelIds.map((labelId) => ({ labelId })) }
+          : undefined,
       },
       include: TASK_INCLUDE,
     });
   }
 
-  async update(workspaceId: string, id: string, dto: UpdateTaskDto) {
-    await this.ensureExists(workspaceId, id);
+  async update(
+    workspaceId: string,
+    id: string,
+    actorId: string,
+    dto: UpdateTaskDto,
+  ) {
+    const existing = await this.prisma.task.findFirst({
+      where: { id, workspaceId },
+    });
+    if (!existing) throw new NotFoundException('Task not found');
+
     const { assigneeIds, labelIds, dueDateStart, dueDateEnd, ...rest } = dto;
 
-    return this.prisma.task.update({
+    const updated = await this.prisma.task.update({
       where: { id },
       data: {
         ...rest,
-        ...(dueDateStart !== undefined && { dueDateStart: dueDateStart ? new Date(dueDateStart) : null }),
-        ...(dueDateEnd !== undefined && { dueDateEnd: dueDateEnd ? new Date(dueDateEnd) : null }),
-        ...(assigneeIds && { assignees: { deleteMany: {}, create: assigneeIds.map((userId) => ({ userId })) } }),
-        ...(labelIds && { labels: { deleteMany: {}, create: labelIds.map((labelId) => ({ labelId })) } }),
+        ...(dueDateStart !== undefined && {
+          dueDateStart: dueDateStart ? new Date(dueDateStart) : null,
+        }),
+        ...(dueDateEnd !== undefined && {
+          dueDateEnd: dueDateEnd ? new Date(dueDateEnd) : null,
+        }),
+        ...(assigneeIds && {
+          assignees: {
+            deleteMany: {},
+            create: assigneeIds.map((userId) => ({ userId })),
+          },
+        }),
+        ...(labelIds && {
+          labels: {
+            deleteMany: {},
+            create: labelIds.map((labelId) => ({ labelId })),
+          },
+        }),
       },
       include: TASK_INCLUDE,
     });
+
+    if (dto.priority && dto.priority !== existing.priority) {
+      await this.activityService.log(
+        id,
+        actorId,
+        ActivityType.PRIORITY_CHANGED,
+        existing.priority,
+        dto.priority,
+      );
+    }
+    if (dto.statusId && dto.statusId !== existing.statusId) {
+      await this.activityService.log(
+        id,
+        actorId,
+        ActivityType.STATUS_CHANGED,
+        existing.statusId,
+        dto.statusId,
+      );
+    }
+
+    return updated;
   }
 
   async move(workspaceId: string, id: string, dto: MoveTaskDto) {
@@ -119,7 +178,9 @@ export class TasksService {
   }
 
   private async ensureExists(workspaceId: string, id: string) {
-    const task = await this.prisma.task.findFirst({ where: { id, workspaceId } });
+    const task = await this.prisma.task.findFirst({
+      where: { id, workspaceId },
+    });
     if (!task) throw new NotFoundException('Task not found');
   }
 }
