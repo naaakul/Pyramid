@@ -2,9 +2,9 @@
 import { useStatuses, useTasks } from '@/hooks/use-tasks';
 import { KanbanColumn } from './kanban-column';
 
-export function KanbanBoard() {
+export function KanbanBoard({ search }: { search?: string }) {
   const { data: statuses, isLoading: statusesLoading } = useStatuses();
-  const { data: tasks, isLoading: tasksLoading } = useTasks();
+  const { data: tasks, isLoading: tasksLoading } = useTasks(search);
 
   if (statusesLoading || tasksLoading) {
     return <div className="p-6 text-sm text-gray-500">Loading board...</div>;
