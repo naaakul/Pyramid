@@ -1,20 +1,22 @@
-'use client';
+"use client";
 
-import { ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import Image from "next/image";
+import { CurrentUser } from "@/lib/api/auth";
 
-export function WorkspaceSwitcher({ name }: { name: string }) {
+export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -24,12 +26,21 @@ export function WorkspaceSwitcher({ name }: { name: string }) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-6 w-6 rounded-full">
-                <AvatarFallback className="rounded-full bg-gradient-to-br from-pink-400 to-purple-500 text-white text-xs">
-                  {name.charAt(0)}
-                </AvatarFallback>
+              <Avatar className="h-6 w-6 rounded-full overflow-hidden ml-1">
+                {user.avatarUrl ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt=""
+                    height={100}
+                    width={100}
+                  />
+                ) : (
+                  <AvatarFallback className="bg-gradient-to-br from-pink-400 to-purple-500 text-white text-xs">
+                    {user.name.charAt(0)}
+                  </AvatarFallback>
+                )}
               </Avatar>
-              <span className="font-semibold">{name}</span>
+              <span className="font-semibold text-nowrap">{user.name}</span>
               <ChevronsUpDown className="ml-auto h-4 w-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>

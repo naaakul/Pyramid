@@ -1,5 +1,3 @@
-// apps\api\src\auth\auth.service.ts
-
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -29,9 +27,7 @@ export class AuthService {
   ) {}
 
   private randomAvatarColor() {
-    return AVATAR_COLORS[
-      Math.floor(Math.random() * AVATAR_COLORS.length)
-    ];
+    return AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
   }
 
   private async createWorkspaceForUser(
@@ -69,30 +65,22 @@ export class AuthService {
       },
     });
 
-    const workspace = await this.createWorkspaceForUser(
-      user.id,
-      'GUEST',
-    );
+    const workspace = await this.createWorkspaceForUser(user.id, 'GUEST');
 
-    const userWithMemberships =
-      await this.prisma.user.findUnique({
-        where: {
-          id: user.id,
-        },
-        include: {
-          memberships: true,
-        },
-      });
+    const userWithMemberships = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        memberships: true,
+      },
+    });
 
     if (!userWithMemberships) {
       throw new Error('Failed to fetch created guest user');
     }
 
-    return this.issueToken(
-      user.id,
-      workspace.id,
-      userWithMemberships,
-    );
+    return this.issueToken(user.id, workspace.id, userWithMemberships);
   }
 
   async validateGoogleUser(profile: Profile) {
@@ -100,10 +88,7 @@ export class AuthService {
 
     const existing = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { googleId: profile.id },
-          ...(email ? [{ email }] : []),
-        ],
+        OR: [{ googleId: profile.id }, ...(email ? [{ email }] : [])],
       },
       include: {
         memberships: true,
@@ -126,33 +111,30 @@ export class AuthService {
         },
       });
 
-      await this.createWorkspaceForUser(
-        createdUser.id,
-        'OWNER',
-      );
+      await this.createWorkspaceForUser(createdUser.id, 'OWNER');
 
-      const userWithMemberships =
-        await this.prisma.user.findUnique({
-          where: {
-            id: createdUser.id,
-          },
-          include: {
-            memberships: true,
-          },
-        });
+      const userWithMemberships = await this.prisma.user.findUnique({
+        where: {
+          id: createdUser.id,
+        },
+        include: {
+          memberships: true,
+        },
+      });
 
       if (!userWithMemberships) {
         throw new Error('Failed to fetch created Google user');
       }
 
       user = userWithMemberships;
-    } else if (!user.googleId) {
+    } else {
       user = await this.prisma.user.update({
         where: {
           id: user.id,
         },
         data: {
           googleId: profile.id,
+          avatarUrl: profile.photos?.[0]?.value ?? null,
         },
         include: {
           memberships: true,
@@ -160,12 +142,11 @@ export class AuthService {
       });
     }
 
-    const membership =
-      await this.prisma.workspaceMember.findFirst({
-        where: {
-          userId: user.id,
-        },
-      });
+    const membership = await this.prisma.workspaceMember.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
 
     return {
       ...user,
@@ -173,11 +154,7 @@ export class AuthService {
     };
   }
 
-  issueToken(
-    userId: string,
-    workspaceId: string,
-    user: any,
-  ) {
+  issueToken(userId: string, workspaceId: string, user: any) {
     const token = this.jwt.sign({
       sub: userId,
       workspaceId,
