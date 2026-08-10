@@ -8,6 +8,7 @@ import { CommentsModule } from './comments/comments.module';
 import { LabelsModule } from './labels/labels.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ProjectsModule } from './projects/projects.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { ProjectsModule } from './projects/projects.module';
     CommentsModule,
     LabelsModule,
     WorkspacesModule,
-    ProjectsModule
+    ProjectsModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
