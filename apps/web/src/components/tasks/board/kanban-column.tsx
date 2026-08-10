@@ -18,7 +18,7 @@ export function KanbanColumn({ status, tasks }: { status: ApiStatus; tasks: ApiT
   }
 
   return (
-    <div className="w-72 shrink-0 flex flex-col">
+    <div className="w-72 shrink-0 flex flex-col rounded-lg bg-secondary border border-border border-">
       <div className="flex items-center justify-between px-1 py-1.5">
         <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
           <GripVertical size={14} className="text-gray-400" />
@@ -29,7 +29,7 @@ export function KanbanColumn({ status, tasks }: { status: ApiStatus; tasks: ApiT
           <button className="hover:text-gray-600"><MoreHorizontal size={16} /></button>
         </div>
       </div>
-      <div className="flex flex-col gap-2 bg-gray-50 rounded-lg p-2 flex-1">
+      <div className="flex flex-col gap-2 bg-secondary rounded-lg p-2 flex-1">
         {tasks.map((task) => <TaskCard key={task.id} task={task} />)}
         {adding ? (
           <input

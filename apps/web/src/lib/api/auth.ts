@@ -2,9 +2,11 @@ export interface CurrentUser {
   id: string;
   name: string;
   email: string | null;
-  avatarUrl: string | null;
   avatarColor: string | null;
+  avatarUrl: string | null;
   isGuest: boolean;
+  themeMode: 'LIGHT' | 'DARK';
+  colorMode: 'AMBER' | 'BLUE' | 'PINK' | 'ROSE' | 'EMERALD' | 'BLACK';
 }
 
 export async function getCurrentUser(

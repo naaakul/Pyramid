@@ -2,6 +2,90 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@theme {
+  --color-ink-50: var(--ink-50);
+  --color-ink-100: var(--ink-100);
+  --color-ink-300: var(--ink-300);
+  --color-ink-400: var(--ink-400);
+  --color-ink-500: var(--ink-500);
+  --color-ink-600: var(--ink-600);
+  --color-ink-700: var(--ink-700);
+  --color-ink-900: var(--ink-900);
+}
+
+:root[data-color="amber"] {
+  --ink-50: #fffbeb;
+  --ink-100: #fef3c7;
+  --ink-300: #fcd34d;
+  --ink-400: #fbbf24;
+  --ink-500: #f59e0b;
+  --ink-600: #d97706;
+  --ink-700: #b45309;
+  --ink-900: #78350f;
+}
+:root[data-color="blue"] {
+  --ink-50: #eff6ff;
+  --ink-100: #dbeafe;
+  --ink-300: #93c5fd;
+  --ink-400: #60a5fa;
+  --ink-500: #3b82f6;
+  --ink-600: #2563eb;
+  --ink-700: #1d4ed8;
+  --ink-900: #1e3a8a;
+}
+:root[data-color="pink"] {
+  --ink-50: #fdf2f8;
+  --ink-100: #fce7f3;
+  --ink-300: #f9a8d4;
+  --ink-400: #f472b6;
+  --ink-500: #ec4899;
+  --ink-600: #db2777;
+  --ink-700: #be185d;
+  --ink-900: #831843;
+}
+:root[data-color="rose"] {
+  --ink-50: #fff1f2;
+  --ink-100: #ffe4e6;
+  --ink-300: #fda4af;
+  --ink-400: #fb7185;
+  --ink-500: #f43f5e;
+  --ink-600: #e11d48;
+  --ink-700: #be123c;
+  --ink-900: #881337;
+}
+:root[data-color="emerald"] {
+  --ink-50: #ecfdf5;
+  --ink-100: #d1fae5;
+  --ink-300: #6ee7b7;
+  --ink-400: #34d399;
+  --ink-500: #10b981;
+  --ink-600: #059669;
+  --ink-700: #047857;
+  --ink-900: #064e3b;
+}
+:root[data-color="black"],
+:root:not([data-color]) {
+  --ink-50: #fafafa;
+  --ink-100: #f4f4f5;
+  --ink-300: #d4d4d8;
+  --ink-400: #a1a1aa;
+  --ink-500: #71717a;
+  --ink-600: #52525b;
+  --ink-700: #3f3f46;
+  --ink-900: #18181b;
+}
+.dark[data-color="black"],
+.dark:not([data-color]) {
+  --ink-50: #18181b;
+  --ink-100: #27272a;
+  --ink-300: #52525b;
+  --ink-400: #71717a;
+  --ink-500: #a1a1aa;
+  --ink-600: #d4d4d8;
+  --ink-700: #e4e4e7;
+  --ink-900: #fafafa;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -62,7 +146,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
+  --border: #e1e1e1;
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
