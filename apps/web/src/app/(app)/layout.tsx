@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/api/auth';
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
+import { BreadcrumbSlot } from '@/components/layout/breadcrumb-slot';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -17,6 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <header className="flex h-12 items-center gap-2 px-4 border-b">
           <SidebarTrigger />
           <Separator orientation="vertical" className="h-4" />
+          <BreadcrumbSlot />
         </header>
         <div className="flex-1">{children}</div>
       </SidebarInset>
