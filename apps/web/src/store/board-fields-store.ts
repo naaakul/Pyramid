@@ -22,7 +22,6 @@ export const useBoardFieldsStore = create<BoardFieldsState>((set) => ({
   priority: true,
   members: true,
   dueDate: true,
-  members2: true,
   labels: false,
   status: false,
   reporter: false,

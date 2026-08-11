@@ -59,7 +59,6 @@ export const COLUMN_DEFS: ColumnDef[] = [
 const FIELD_TO_COLUMN: Record<FieldKey, string> = {
   priority: 'priority',
   members: 'members',
-  members2: 'members',
   dueDate: 'dueDate',
   labels: 'labels',
   status: 'status',
