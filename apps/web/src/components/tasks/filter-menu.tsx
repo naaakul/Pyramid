@@ -24,7 +24,7 @@ export function FilterMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className='border-ink-border text-ink-text hover:bg-ink-bg hover:text-none'>
         <Button variant="outline" size="icon" className={count > 0 ? 'border-black' : ''}>
           <FilterIcon size={16} />
         </Button>

@@ -15,9 +15,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <SidebarProvider>
       <AppSidebar user={user} />
       <SidebarInset>
-        <header className="flex h-12 items-center gap-2 px-4 border-b">
-          <SidebarTrigger />
-          <Separator orientation="vertical" className="h-4" />
+        <header className="flex h-12 items-center gap-2 px-4 border-b border-ink-border pl-2">
+          <SidebarTrigger className='text-ink-text hover:text-ink-700 hover:bg-ink-bg' />
           <BreadcrumbSlot />
         </header>
         <div className="flex-1">{children}</div>

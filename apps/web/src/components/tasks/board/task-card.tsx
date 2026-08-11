@@ -18,10 +18,10 @@ export function TaskCard({ task }: { task: ApiTask }) {
 
   return (
     <Link href={`/tasks/${task.id}`} className="block">
-      <Card className="p-3 gap-2 shadow-none">
-        <div className="flex items-start justify-between">
-          <p className="text-sm font-medium">{task.title}</p>
-          <MoreHorizontal size={16} className="text-gray-400 shrink-0" />
+      <Card className="p-3 pt-1.5 gap-2 shadow-none border-ink-border">
+        <div className="flex items-start justify-between ">
+          <p className="text-sm font-medium text-ink-text">{task.title}</p>
+          <MoreHorizontal size={16} className="text-ink-sec shrink-0" />
         </div>
 
         {(isMembersVisible(visible) || visible.dueDate) && (
@@ -29,11 +29,11 @@ export function TaskCard({ task }: { task: ApiTask }) {
             {isMembersVisible(visible) && assignee && (
               <div className="flex items-center gap-1.5">
                 <Avatar className="h-5 w-5">
-                  <AvatarFallback className="text-[10px] bg-gradient-to-br from-pink-400 to-purple-500 text-white">
+                  <AvatarFallback className="text-[10px] bg-gradient-to-br from-ink-400 to-ink-700 text-white">
                     {assignee.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-xs text-gray-600">{assignee.name}</span>
+                <span className="text-xs text-ink-sec">{assignee.name}</span>
               </div>
             )}
             {visible.dueDate && task.dueDateEnd && (

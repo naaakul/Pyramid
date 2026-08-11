@@ -67,11 +67,11 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
                   </AvatarFallback>
                 )}
               </Avatar>
-              <span className="font-semibold text-nowrap">{user.name}</span>
-              <ChevronsUpDown className="ml-auto h-4 w-4" />
+              <span className="font-semibold text-nowrap text-ink-text">{user.name}</span>
+              <ChevronsUpDown className="ml-auto h-4 w-4 text-ink-text" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-64">
+          <DropdownMenuContent align="start" className="w-60 border-ink-border text-ink-text bg-ink-bg shadow-ink-100">
             <div className="flex flex-col items-center py-3 border-b mb-1">
               <Avatar className="h-10 w-10 rounded-full mb-2 overflow-hidden">
                 {user.avatarUrl ? (
@@ -95,7 +95,7 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
               <DropdownMenuSubTrigger>
                 <Sun size={14} className="mr-2" /> Change Theme
               </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
+              <DropdownMenuSubContent className="border-ink-border text-ink-text ">
                 <DropdownMenuItem
                   onClick={() => setThemeMode("LIGHT")}
                   className="flex items-center justify-between"
@@ -125,7 +125,7 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
                 />
                 Color Mode
               </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
+              <DropdownMenuSubContent className="border-ink-border text-ink-text">
                 {displayOptions.map((opt) => (
                   <DropdownMenuItem
                     key={opt.value}

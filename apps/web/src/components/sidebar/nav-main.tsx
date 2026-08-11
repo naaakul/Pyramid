@@ -21,11 +21,11 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Workspace</SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarGroupLabel className='text-ink-text'>Workspace</SidebarGroupLabel>
+      <SidebarMenu className='gap-1'>
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
           <SidebarMenuItem key={href}>
-            <SidebarMenuButton asChild isActive={pathname.startsWith(href)}>
+            <SidebarMenuButton asChild isActive={pathname.startsWith(href)} className='text-ink-sec'>
               <Link href={href}>
                 <Icon />
                 <span>{label}</span>

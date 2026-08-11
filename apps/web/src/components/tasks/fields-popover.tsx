@@ -27,8 +27,9 @@ export function FieldsPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Columns3 size={16} className="mr-1" /> Fields
+        <Button variant="outline" className="py-1 gap-0 border-ink-border text-ink-text hover:bg-ink-bg hover:text-none">
+          <Columns3 size={16} className="mr-1" /> 
+          <p className="mb-0.5">Fields</p>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-64 p-2">

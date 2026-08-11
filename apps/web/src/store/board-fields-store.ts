@@ -32,5 +32,5 @@ export const useBoardFieldsStore = create<BoardFieldsState>((set) => ({
 }));
 
 export function isMembersVisible(visible: Record<FieldKey, boolean>) {
-  return visible.members || visible.members2;
+  return visible.members;
 }

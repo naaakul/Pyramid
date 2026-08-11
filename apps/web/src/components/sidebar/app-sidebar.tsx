@@ -15,14 +15,14 @@ export function AppSidebar({
   workspaceName?: string;
 }) {
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
+    <Sidebar collapsible="icon" className="border-ink-border">
+      <SidebarHeader className="bg-ink-bg">
         <WorkspaceSwitcher user={user} />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-ink-bg">
         <NavMain />
       </SidebarContent>
-      <SidebarRail />
+      <SidebarRail className="hover:after:bg-ink-border" />
     </Sidebar>
   );
 }
