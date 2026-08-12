@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -54,14 +55,14 @@ export class TasksService {
     });
   }
 
-  async findOne(workspaceId: string, id: string) {
+  async findOne(workspaceId: string, id: string, requesterId: string) {
     const task = await this.prisma.task.findFirst({
       where: { id, workspaceId },
       include: {
         ...TASK_INCLUDE,
         parentTask: { select: { id: true, title: true } },
         subtasks: { include: TASK_INCLUDE },
-        comments: true, // full comment tree now fetched separately via /tasks/:id/comments
+        comments: true,
         attachments: true,
         activities: {
           include: { actor: true },
@@ -76,36 +77,147 @@ export class TasksService {
       },
     });
     if (!task) throw new NotFoundException('Task not found');
-    return task;
-  }
 
-  async create(workspaceId: string, reporterId: string, dto: CreateTaskDto) {
-    // Prevent subtasks from having their own subtasks
-    if (dto.parentTaskId) {
-      const parent = await this.prisma.task.findUnique({
-        where: { id: dto.parentTaskId },
-      });
-
-      if (parent?.parentTaskId) {
-        throw new BadRequestException(
-          'Subtasks cannot themselves have subtasks',
-        );
+    if (task.parentTaskId) {
+      const isReporter = task.reporterId === requesterId;
+      const isAssignee = task.assignees.some((a) => a.userId === requesterId);
+      if (!isReporter && !isAssignee) {
+        throw new ForbiddenException('You are not a member of this subtask');
       }
     }
 
-    let statusId = dto.statusId;
+    return task;
+  }
 
+  async update(
+    workspaceId: string,
+    id: string,
+    actorId: string,
+    dto: UpdateTaskDto,
+  ) {
+    const existing = await this.prisma.task.findFirst({
+      where: { id, workspaceId },
+      include: { labels: true },
+    });
+    if (!existing) throw new NotFoundException('Task not found');
+
+    const { assigneeIds, labelIds, dueDateStart, dueDateEnd, ...rest } = dto;
+
+    const updated = await this.prisma.task.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(dueDateStart !== undefined && {
+          dueDateStart: dueDateStart ? new Date(dueDateStart) : null,
+        }),
+        ...(dueDateEnd !== undefined && {
+          dueDateEnd: dueDateEnd ? new Date(dueDateEnd) : null,
+        }),
+        ...(assigneeIds && {
+          assignees: {
+            deleteMany: {},
+            create: assigneeIds.map((userId) => ({ userId })),
+          },
+        }),
+        ...(labelIds && {
+          labels: {
+            deleteMany: {},
+            create: labelIds.map((labelId) => ({ labelId })),
+          },
+        }),
+      },
+      include: TASK_INCLUDE,
+    });
+
+    if (dto.title !== undefined && dto.title !== existing.title) {
+      await this.activityService.log(
+        id,
+        actorId,
+        ActivityType.TITLE_CHANGED,
+        existing.title,
+        dto.title,
+      );
+    }
+    if (
+      dto.description !== undefined &&
+      dto.description !== existing.description
+    ) {
+      await this.activityService.log(
+        id,
+        actorId,
+        ActivityType.DESCRIPTION_CHANGED,
+      );
+    }
+    if (dto.priority && dto.priority !== existing.priority) {
+      await this.activityService.log(
+        id,
+        actorId,
+        ActivityType.PRIORITY_CHANGED,
+        existing.priority,
+        dto.priority,
+      );
+    }
+    if (dto.statusId && dto.statusId !== existing.statusId) {
+      await this.activityService.log(
+        id,
+        actorId,
+        ActivityType.STATUS_CHANGED,
+        existing.statusId,
+        dto.statusId,
+      );
+    }
+    if (dueDateStart !== undefined || dueDateEnd !== undefined) {
+      await this.activityService.log(
+        id,
+        actorId,
+        ActivityType.DUE_DATE_CHANGED,
+      );
+    }
+    if (dto.isLocked !== undefined && dto.isLocked !== existing.isLocked) {
+      await this.activityService.log(
+        id,
+        actorId,
+        dto.isLocked ? ActivityType.LOCKED : ActivityType.UNLOCKED,
+      );
+    }
+    if (labelIds) {
+      const oldIds = new Set(existing.labels.map((l) => l.labelId));
+      const newIds = new Set(labelIds);
+      for (const addedId of newIds)
+        if (!oldIds.has(addedId))
+          await this.activityService.log(id, actorId, ActivityType.LABEL_ADDED);
+      for (const removedId of oldIds)
+        if (!newIds.has(removedId))
+          await this.activityService.log(
+            id,
+            actorId,
+            ActivityType.LABEL_REMOVED,
+          );
+    }
+
+    return updated;
+  }
+
+  async create(workspaceId: string, reporterId: string, dto: CreateTaskDto) {
+    let statusId = dto.statusId;
     if (!statusId) {
       const defaultStatus = await this.prisma.status.findFirst({
         where: { workspaceId },
         orderBy: { order: 'asc' },
       });
-
-      if (!defaultStatus) {
+      if (!defaultStatus)
         throw new NotFoundException('No statuses configured for workspace');
-      }
-
       statusId = defaultStatus.id;
+    }
+
+    if (dto.parentTaskId) {
+      const parent = await this.prisma.task.findUnique({
+        where: { id: dto.parentTaskId },
+      });
+      if (parent?.parentTaskId)
+        throw new BadRequestException(
+          'Subtasks cannot themselves have subtasks',
+        );
     }
 
     const maxPosition = await this.prisma.task.aggregate({
@@ -113,7 +225,7 @@ export class TasksService {
       _max: { position: true },
     });
 
-    return this.prisma.task.create({
+    const task = await this.prisma.task.create({
       data: {
         workspaceId,
         reporterId,
@@ -126,98 +238,43 @@ export class TasksService {
         dueDateStart: dto.dueDateStart ? new Date(dto.dueDateStart) : undefined,
         dueDateEnd: dto.dueDateEnd ? new Date(dto.dueDateEnd) : undefined,
         position: (maxPosition._max.position ?? 0) + 1,
-
         assignees: dto.assigneeIds
-          ? {
-              create: dto.assigneeIds.map((userId) => ({
-                userId,
-              })),
-            }
+          ? { create: dto.assigneeIds.map((userId) => ({ userId })) }
           : undefined,
-
         labels: dto.labelIds
-          ? {
-              create: dto.labelIds.map((labelId) => ({
-                labelId,
-              })),
-            }
+          ? { create: dto.labelIds.map((labelId) => ({ labelId })) }
           : undefined,
       },
       include: TASK_INCLUDE,
     });
+
+    if (dto.parentTaskId) {
+      await this.activityService.log(
+        dto.parentTaskId,
+        reporterId,
+        ActivityType.SUBTASK_ADDED,
+        undefined,
+        task.title,
+      );
+    }
+    return task;
   }
 
-  async update(
-    workspaceId: string,
-    id: string,
-    actorId: string,
-    dto: UpdateTaskDto,
-  ) {
-    const existing = await this.prisma.task.findFirst({
+  async remove(workspaceId: string, id: string) {
+    const task = await this.prisma.task.findFirst({
       where: { id, workspaceId },
     });
-
-    if (!existing) {
-      throw new NotFoundException('Task not found');
-    }
-
-    const { assigneeIds, labelIds, dueDateStart, dueDateEnd, ...rest } = dto;
-
-    const updated = await this.prisma.task.update({
-      where: { id },
-      data: {
-        ...rest,
-
-        ...(dueDateStart !== undefined && {
-          dueDateStart: dueDateStart ? new Date(dueDateStart) : null,
-        }),
-
-        ...(dueDateEnd !== undefined && {
-          dueDateEnd: dueDateEnd ? new Date(dueDateEnd) : null,
-        }),
-
-        ...(assigneeIds && {
-          assignees: {
-            deleteMany: {},
-            create: assigneeIds.map((userId) => ({
-              userId,
-            })),
-          },
-        }),
-
-        ...(labelIds && {
-          labels: {
-            deleteMany: {},
-            create: labelIds.map((labelId) => ({
-              labelId,
-            })),
-          },
-        }),
-      },
-      include: TASK_INCLUDE,
-    });
-
-    if (dto.priority && dto.priority !== existing.priority) {
+    if (!task) throw new NotFoundException('Task not found');
+    await this.prisma.task.delete({ where: { id } });
+    if (task.parentTaskId) {
       await this.activityService.log(
-        id,
-        actorId,
-        ActivityType.PRIORITY_CHANGED,
-        existing.priority,
-        dto.priority,
+        task.parentTaskId,
+        task.reporterId,
+        ActivityType.SUBTASK_DELETED,
+        task.title,
       );
     }
-
-    if (dto.statusId && dto.statusId !== existing.statusId) {
-      await this.activityService.log(
-        id,
-        actorId,
-        ActivityType.STATUS_CHANGED,
-        existing.statusId,
-        dto.statusId,
-      );
-    }
-
-    return updated;
+    return { success: true };
   }
 
   async move(workspaceId: string, id: string, dto: MoveTaskDto) {
@@ -231,16 +288,6 @@ export class TasksService {
       },
       include: TASK_INCLUDE,
     });
-  }
-
-  async remove(workspaceId: string, id: string) {
-    await this.ensureExists(workspaceId, id);
-
-    await this.prisma.task.delete({
-      where: { id },
-    });
-
-    return { success: true };
   }
 
   private async ensureExists(workspaceId: string, id: string) {
@@ -260,21 +307,11 @@ export class TasksService {
     actorId: string,
   ) {
     await this.ensureExists(workspaceId, taskId);
-
     await this.prisma.taskAssignee.upsert({
-      where: {
-        taskId_userId: {
-          taskId,
-          userId,
-        },
-      },
-      create: {
-        taskId,
-        userId,
-      },
+      where: { taskId_userId: { taskId, userId } },
+      create: { taskId, userId },
       update: {},
     });
-
     await this.activityService.log(
       taskId,
       actorId,
@@ -282,8 +319,7 @@ export class TasksService {
       undefined,
       userId,
     );
-
-    return this.findOne(workspaceId, taskId);
+    return this.findOne(workspaceId, taskId, actorId);
   }
 
   async removeAssignee(
@@ -293,14 +329,7 @@ export class TasksService {
     actorId: string,
   ) {
     await this.ensureExists(workspaceId, taskId);
-
-    await this.prisma.taskAssignee.deleteMany({
-      where: {
-        taskId,
-        userId,
-      },
-    });
-
+    await this.prisma.taskAssignee.deleteMany({ where: { taskId, userId } });
     await this.activityService.log(
       taskId,
       actorId,
@@ -308,24 +337,48 @@ export class TasksService {
       userId,
       undefined,
     );
-
-    return this.findOne(workspaceId, taskId);
+    return this.findOne(workspaceId, taskId, actorId);
   }
 
-  async addTeam(workspaceId: string, taskId: string, teamId: string) {
+  async addTeam(
+    workspaceId: string,
+    taskId: string,
+    teamId: string,
+    actorId: string,
+  ) {
     await this.ensureExists(workspaceId, taskId);
+    const team = await this.prisma.team.findUnique({ where: { id: teamId } });
     await this.prisma.taskTeam.upsert({
       where: { taskId_teamId: { taskId, teamId } },
       create: { taskId, teamId },
       update: {},
     });
-    return this.findOne(workspaceId, taskId);
+    await this.activityService.log(
+      taskId,
+      actorId,
+      ActivityType.TEAM_ADDED,
+      undefined,
+      team?.name,
+    );
+    return this.findOne(workspaceId, taskId, actorId);
   }
 
-  async removeTeam(workspaceId: string, taskId: string, teamId: string) {
+  async removeTeam(
+    workspaceId: string,
+    taskId: string,
+    teamId: string,
+    actorId: string,
+  ) {
     await this.ensureExists(workspaceId, taskId);
+    const team = await this.prisma.team.findUnique({ where: { id: teamId } });
     await this.prisma.taskTeam.deleteMany({ where: { taskId, teamId } });
-    return this.findOne(workspaceId, taskId);
+    await this.activityService.log(
+      taskId,
+      actorId,
+      ActivityType.TEAM_REMOVED,
+      team?.name,
+    );
+    return this.findOne(workspaceId, taskId, actorId);
   }
 
   async recordView(taskId: string, userId: string) {
@@ -348,5 +401,14 @@ export class TasksService {
         data: { viewedAt: new Date() },
       });
     }
+  }
+
+  async findAssignees(workspaceId: string, taskId: string) {
+    const task = await this.prisma.task.findFirst({
+      where: { id: taskId, workspaceId },
+      include: { assignees: { include: { user: true } } },
+    });
+    if (!task) throw new NotFoundException('Task not found');
+    return task.assignees.map((a) => a.user);
   }
 }

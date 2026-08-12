@@ -1,15 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ActivityService } from '../activity/activity.service';
+import { ActivityType } from '@prisma/client';
 import { CreateAttachmentDto } from './dto/create-attachment.dto';
 
 @Injectable()
 export class AttachmentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private activityService: ActivityService) {}
 
   async create(workspaceId: string, taskId: string, addedById: string, dto: CreateAttachmentDto) {
     const task = await this.prisma.task.findFirst({ where: { id: taskId, workspaceId } });
     if (!task) throw new NotFoundException('Task not found');
-    return this.prisma.attachment.create({ data: { taskId, addedById, ...dto } });
+    const attachment = await this.prisma.attachment.create({ data: { taskId, addedById, ...dto } });
+    await this.activityService.log(taskId, addedById, ActivityType.ATTACHMENT_ADDED, undefined, dto.name);
+    return attachment;
   }
 
   async remove(workspaceId: string, taskId: string, id: string) {

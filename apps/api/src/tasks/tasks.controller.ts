@@ -33,8 +33,9 @@ export class TasksController {
   @Post() create(@CurrentUser() u: AuthUser, @Body() dto: CreateTaskDto) {
     return this.tasksService.create(u.workspaceId, u.userId, dto);
   }
-  @Get(':id') findOne(@CurrentUser() u: AuthUser, @Param('id') id: string) {
-    return this.tasksService.findOne(u.workspaceId, id);
+  @Get(':id')
+  findOne(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    return this.tasksService.findOne(u.workspaceId, id, u.userId);
   }
   @Patch(':id') update(
     @CurrentUser() u: AuthUser,
@@ -83,20 +84,25 @@ export class TasksController {
     @Param('id') id: string,
     @Param('teamId') teamId: string,
   ) {
-    return this.tasksService.addTeam(u.workspaceId, id, teamId);
+    return this.tasksService.addTeam(u.workspaceId, id, teamId, u.userId);
   }
-
+  
   @Delete(':id/teams/:teamId')
   removeTeam(
     @CurrentUser() u: AuthUser,
     @Param('id') id: string,
     @Param('teamId') teamId: string,
   ) {
-    return this.tasksService.removeTeam(u.workspaceId, id, teamId);
+    return this.tasksService.removeTeam(u.workspaceId, id, teamId, u.userId);
   }
 
   @Post(':id/view')
   recordView(@CurrentUser() u: AuthUser, @Param('id') id: string) {
     return this.tasksService.recordView(id, u.userId);
+  }
+
+  @Get(':id/assignees')
+  findAssignees(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    return this.tasksService.findAssignees(u.workspaceId, id);
   }
 }
