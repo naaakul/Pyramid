@@ -55,9 +55,16 @@ export interface ApiActivity {
   actor: ApiUser;
 }
 
-export interface ApiTeam {
+export interface ApiTask {
   id: string;
-  name: string;
+  workspaceId: string;
+  title: string;
+  priority: string;
+  statusId: string;
+  status: ApiStatus;
+  dueDateEnd: string | null;
+  assignees: { user: ApiUser }[];
+  labels: { label: ApiLabel }[];
 }
 
 // export interface ApiTaskDetail extends ApiTask {

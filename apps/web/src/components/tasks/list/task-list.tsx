@@ -12,17 +12,17 @@ export function TaskListView({ query }: { query: TaskQuery }) {
   const visible = useBoardFieldsStore((s) => s.visible);
   const columns = getVisibleColumns(visible);
 
-  if (statusesLoading || tasksLoading) return <div className="p-6 text-sm text-gray-500">Loading...</div>;
+  if (statusesLoading || tasksLoading) return <div className="p-6 text-sm text-ink-500">Loading...</div>;
 
   const groups = (statuses ?? []).map((status) => ({
     status,
-    tasks: (tasks ?? []).filter((t) => t.statusId === status.id),
+    tasks: (tasks ?? []).filter((t) => t.status.name === status.name),
   }));
   const hasActiveFilter = Object.values(query).some(Boolean);
   const visibleGroups = hasActiveFilter ? groups.filter((g) => g.tasks.length > 0) : groups;
 
   if (hasActiveFilter && visibleGroups.length === 0) {
-    return <div className="px-6 py-16 text-center text-sm text-gray-400">No tasks match these filters</div>;
+    return <div className="px-6 py-16 text-center text-sm text-ink-400">No tasks match these filters</div>;
   }
 
   return (
