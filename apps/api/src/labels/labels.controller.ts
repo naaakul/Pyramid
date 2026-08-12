@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Delete, Param } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { LabelsService } from './labels.service';
@@ -13,7 +13,15 @@ export class LabelsController {
     return this.labelsService.findAll(u.workspaceId);
   }
 
-  @Post() create(@CurrentUser() u: { workspaceId: string }, @Body() dto: CreateLabelDto) {
+  @Post() create(
+    @CurrentUser() u: { workspaceId: string },
+    @Body() dto: CreateLabelDto,
+  ) {
     return this.labelsService.create(u.workspaceId, dto);
+  }
+
+  @Delete(':id')
+  remove(@CurrentUser() u: { workspaceId: string }, @Param('id') id: string) {
+    return this.labelsService.remove(u.workspaceId, id);
   }
 }

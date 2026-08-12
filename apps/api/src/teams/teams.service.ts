@@ -8,4 +8,8 @@ export class TeamsService {
   findAll(workspaceId: string) {
     return this.prisma.team.findMany({ where: { workspaceId } });
   }
+
+  create(workspaceId: string, name: string) {
+    return this.prisma.team.create({ data: { workspaceId, name } });
+  }
 }

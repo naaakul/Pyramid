@@ -57,15 +57,15 @@ model WorkspaceInvite {
   workspaceId   String
   invitedUserId String
   invitedById   String
-  taskId        String?      
+  taskId        String?
   status        InviteStatus @default(PENDING)
   createdAt     DateTime     @default(now())
   respondedAt   DateTime?
 
-  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  invitedUser   User      @relation("InvitesReceived", fields: [invitedUserId], references: [id], onDelete: Cascade)
-  invitedBy     User      @relation("InvitesSent", fields: [invitedById], references: [id], onDelete: Cascade)
-  task          Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedUser User      @relation("InvitesReceived", fields: [invitedUserId], references: [id], onDelete: Cascade)
+  invitedBy   User      @relation("InvitesSent", fields: [invitedById], references: [id], onDelete: Cascade)
+  task        Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   @@unique([workspaceId, invitedUserId, taskId])
 }
@@ -98,6 +98,9 @@ model User {
   attachmentsAdded Attachment[]
   invitesReceived  WorkspaceInvite[] @relation("InvitesReceived")
   invitesSent      WorkspaceInvite[] @relation("InvitesSent")
+
+  commentReactions CommentReaction[]
+  taskWatches      TaskWatcher[]
 }
 
 model Workspace {
@@ -211,13 +214,16 @@ model Task {
   parentTask Task?  @relation("Subtasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
   subtasks   Task[] @relation("Subtasks")
 
-  assignees   TaskAssignee[]
-  labels      TaskLabel[]
-  teams       TaskTeam[]
-  comments    Comment[]
-  attachments Attachment[]
-  activities  Activity[]
-  invites     WorkspaceInvite[]
+  assignees    TaskAssignee[]
+  labels       TaskLabel[]
+  teams        TaskTeam[]
+  comments     Comment[]
+  attachments  Attachment[]
+  activities   Activity[]
+  invites      WorkspaceInvite[]
+  // taskWatchers TaskWatcher[]
+
+  watchers TaskWatcher[]
 
   @@index([workspaceId, statusId])
   @@index([projectId])
@@ -255,19 +261,6 @@ model TaskTeam {
   @@id([taskId, teamId])
 }
 
-model Comment {
-  id        String   @id @default(cuid())
-  taskId    String
-  authorId  String
-  body      String
-  createdAt DateTime @default(now())
-
-  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  author User @relation(fields: [authorId], references: [id])
-
-  @@index([taskId])
-}
-
 model Attachment {
   id        String   @id @default(cuid())
   taskId    String
@@ -296,4 +289,47 @@ model Activity {
   actor User @relation(fields: [actorId], references: [id])
 
   @@index([taskId, createdAt])
+}
+
+model Comment {
+  id              String   @id @default(cuid())
+  taskId          String
+  authorId        String
+  body            String
+  imageUrl        String?
+  parentCommentId String?
+  createdAt       DateTime @default(now())
+
+  task      Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author    User              @relation(fields: [authorId], references: [id])
+  parent    Comment?          @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies   Comment[]         @relation("CommentReplies")
+  reactions CommentReaction[]
+
+  @@index([taskId])
+}
+
+model CommentReaction {
+  id        String   @id @default(cuid())
+  commentId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId, emoji])
+}
+
+model TaskWatcher {
+  id       String    @id @default(cuid())
+  taskId   String
+  userId   String
+  viewedAt DateTime?
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
 }

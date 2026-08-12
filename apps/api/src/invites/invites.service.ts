@@ -1,19 +1,38 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateInviteDto } from './dto/create-invite.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class InvitesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+  ) {}
 
   async create(workspaceId: string, invitedById: string, dto: CreateInviteDto) {
     const existing = await this.prisma.workspaceInvite.findFirst({
-      where: { workspaceId, invitedUserId: dto.invitedUserId, taskId: dto.taskId ?? null, status: 'PENDING' },
+      where: {
+        workspaceId,
+        invitedUserId: dto.invitedUserId,
+        taskId: dto.taskId ?? null,
+        status: 'PENDING',
+      },
     });
-    if (existing) throw new ConflictException('Invite already pending for this user');
+    if (existing)
+      throw new ConflictException('Invite already pending for this user');
 
     return this.prisma.workspaceInvite.create({
-      data: { workspaceId, invitedUserId: dto.invitedUserId, invitedById, taskId: dto.taskId },
+      data: {
+        workspaceId,
+        invitedUserId: dto.invitedUserId,
+        invitedById,
+        taskId: dto.taskId,
+      },
       include: { invitedBy: true, task: true },
     });
   }
@@ -27,9 +46,12 @@ export class InvitesService {
   }
 
   async accept(inviteId: string, userId: string) {
-    const invite = await this.prisma.workspaceInvite.findFirst({ where: { id: inviteId, invitedUserId: userId } });
+    const invite = await this.prisma.workspaceInvite.findFirst({
+      where: { id: inviteId, invitedUserId: userId },
+    });
     if (!invite) throw new NotFoundException('Invite not found');
-    if (invite.status !== 'PENDING') throw new ConflictException('Invite already resolved');
+    if (invite.status !== 'PENDING')
+      throw new ConflictException('Invite already resolved');
 
     await this.prisma.$transaction([
       this.prisma.workspaceInvite.update({
@@ -37,7 +59,9 @@ export class InvitesService {
         data: { status: 'ACCEPTED', respondedAt: new Date() },
       }),
       this.prisma.workspaceMember.upsert({
-        where: { workspaceId_userId: { workspaceId: invite.workspaceId, userId } },
+        where: {
+          workspaceId_userId: { workspaceId: invite.workspaceId, userId },
+        },
         create: { workspaceId: invite.workspaceId, userId, role: 'MEMBER' },
         update: {},
       }),
@@ -52,6 +76,10 @@ export class InvitesService {
         : []),
     ]);
 
-    return { success: true };
+    const token = this.jwt.sign({
+      sub: userId,
+      workspaceId: invite.workspaceId,
+    });
+    return { success: true, token };
   }
 }

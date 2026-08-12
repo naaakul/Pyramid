@@ -59,13 +59,19 @@ export class TasksService {
       where: { id, workspaceId },
       include: {
         ...TASK_INCLUDE,
+        parentTask: { select: { id: true, title: true } },
         subtasks: { include: TASK_INCLUDE },
-        comments: { include: { author: true }, orderBy: { createdAt: 'asc' } },
+        comments: true, // full comment tree now fetched separately via /tasks/:id/comments
         attachments: true,
         activities: {
           include: { actor: true },
           orderBy: { createdAt: 'desc' },
         },
+        invites: {
+          where: { status: { not: 'DECLINED' } },
+          include: { invitedUser: true },
+        },
+        watchers: true,
         reporter: true,
       },
     });
@@ -304,5 +310,43 @@ export class TasksService {
     );
 
     return this.findOne(workspaceId, taskId);
+  }
+
+  async addTeam(workspaceId: string, taskId: string, teamId: string) {
+    await this.ensureExists(workspaceId, taskId);
+    await this.prisma.taskTeam.upsert({
+      where: { taskId_teamId: { taskId, teamId } },
+      create: { taskId, teamId },
+      update: {},
+    });
+    return this.findOne(workspaceId, taskId);
+  }
+
+  async removeTeam(workspaceId: string, taskId: string, teamId: string) {
+    await this.ensureExists(workspaceId, taskId);
+    await this.prisma.taskTeam.deleteMany({ where: { taskId, teamId } });
+    return this.findOne(workspaceId, taskId);
+  }
+
+  async recordView(taskId: string, userId: string) {
+    const existing = await this.prisma.taskWatcher.findUnique({
+      where: { taskId_userId: { taskId, userId } },
+    });
+    if (!existing) {
+      await this.prisma.$transaction([
+        this.prisma.taskWatcher.create({
+          data: { taskId, userId, viewedAt: new Date() },
+        }),
+        this.prisma.task.update({
+          where: { id: taskId },
+          data: { watcherCount: { increment: 1 } },
+        }),
+      ]);
+    } else if (!existing.viewedAt) {
+      await this.prisma.taskWatcher.update({
+        where: { id: existing.id },
+        data: { viewedAt: new Date() },
+      });
+    }
   }
 }

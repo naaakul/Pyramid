@@ -76,4 +76,27 @@ export class TasksController {
       u.userId,
     );
   }
+
+  @Post(':id/teams/:teamId')
+  addTeam(
+    @CurrentUser() u: AuthUser,
+    @Param('id') id: string,
+    @Param('teamId') teamId: string,
+  ) {
+    return this.tasksService.addTeam(u.workspaceId, id, teamId);
+  }
+
+  @Delete(':id/teams/:teamId')
+  removeTeam(
+    @CurrentUser() u: AuthUser,
+    @Param('id') id: string,
+    @Param('teamId') teamId: string,
+  ) {
+    return this.tasksService.removeTeam(u.workspaceId, id, teamId);
+  }
+
+  @Post(':id/view')
+  recordView(@CurrentUser() u: AuthUser, @Param('id') id: string) {
+    return this.tasksService.recordView(id, u.userId);
+  }
 }
