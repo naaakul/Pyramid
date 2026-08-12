@@ -9,6 +9,9 @@ import { LabelsModule } from './labels/labels.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ProjectsModule } from './projects/projects.module';
 import { UsersModule } from './users/users.module';
+import { UploadsModule } from './uploads/uploads.module';
+import { AttachmentsModule } from './attachments/attachments.module';
+import { InvitesModule } from './invites/invites.module';
 
 @Module({
   imports: [
@@ -22,6 +25,9 @@ import { UsersModule } from './users/users.module';
     WorkspacesModule,
     ProjectsModule,
     UsersModule,
+    UploadsModule,
+    AttachmentsModule,
+    InvitesModule,
   ],
 })
 export class AppModule {}

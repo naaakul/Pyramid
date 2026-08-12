@@ -46,6 +46,30 @@ enum ActivityType {
   UPDATE_POSTED
 }
 
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model WorkspaceInvite {
+  id            String       @id @default(cuid())
+  workspaceId   String
+  invitedUserId String
+  invitedById   String
+  taskId        String?      
+  status        InviteStatus @default(PENDING)
+  createdAt     DateTime     @default(now())
+  respondedAt   DateTime?
+
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedUser   User      @relation("InvitesReceived", fields: [invitedUserId], references: [id], onDelete: Cascade)
+  invitedBy     User      @relation("InvitesSent", fields: [invitedById], references: [id], onDelete: Cascade)
+  task          Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@unique([workspaceId, invitedUserId, taskId])
+}
+
 model User {
   id          String  @id @default(cuid())
   email       String? @unique
@@ -72,6 +96,8 @@ model User {
   comments         Comment[]
   activities       Activity[]
   attachmentsAdded Attachment[]
+  invitesReceived  WorkspaceInvite[] @relation("InvitesReceived")
+  invitesSent      WorkspaceInvite[] @relation("InvitesSent")
 }
 
 model Workspace {
@@ -87,6 +113,7 @@ model Workspace {
   labels   Label[]
   teams    Team[]
   statuses Status[]
+  invites  WorkspaceInvite[]
 }
 
 model WorkspaceMember {
@@ -190,6 +217,7 @@ model Task {
   comments    Comment[]
   attachments Attachment[]
   activities  Activity[]
+  invites     WorkspaceInvite[]
 
   @@index([workspaceId, statusId])
   @@index([projectId])

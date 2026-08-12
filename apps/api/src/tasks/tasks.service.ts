@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ActivityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ActivityService } from '../activity/activity.service';
@@ -11,6 +15,7 @@ const TASK_INCLUDE = {
   status: true,
   assignees: { include: { user: true } },
   labels: { include: { label: true } },
+  teams: { include: { team: true } },
   _count: { select: { subtasks: true, comments: true } },
 };
 
@@ -35,9 +40,13 @@ export class TasksService {
         ...(query.assigneeId && {
           assignees: { some: { userId: query.assigneeId } },
         }),
-        ...(query.labelId && { labels: { some: { labelId: query.labelId } } }),
+        ...(query.labelId && {
+          labels: { some: { labelId: query.labelId } },
+        }),
         ...(query.reporterId && { reporterId: query.reporterId }),
-        ...(query.dueDate === 'overdue' && { dueDateEnd: { lt: new Date() } }),
+        ...(query.dueDate === 'overdue' && {
+          dueDateEnd: { lt: new Date() },
+        }),
         ...(query.dueDate === 'no_date' && { dueDateEnd: null }),
       },
       include: TASK_INCLUDE,
@@ -65,14 +74,31 @@ export class TasksService {
   }
 
   async create(workspaceId: string, reporterId: string, dto: CreateTaskDto) {
+    // Prevent subtasks from having their own subtasks
+    if (dto.parentTaskId) {
+      const parent = await this.prisma.task.findUnique({
+        where: { id: dto.parentTaskId },
+      });
+
+      if (parent?.parentTaskId) {
+        throw new BadRequestException(
+          'Subtasks cannot themselves have subtasks',
+        );
+      }
+    }
+
     let statusId = dto.statusId;
+
     if (!statusId) {
       const defaultStatus = await this.prisma.status.findFirst({
         where: { workspaceId },
         orderBy: { order: 'asc' },
       });
-      if (!defaultStatus)
+
+      if (!defaultStatus) {
         throw new NotFoundException('No statuses configured for workspace');
+      }
+
       statusId = defaultStatus.id;
     }
 
@@ -94,11 +120,21 @@ export class TasksService {
         dueDateStart: dto.dueDateStart ? new Date(dto.dueDateStart) : undefined,
         dueDateEnd: dto.dueDateEnd ? new Date(dto.dueDateEnd) : undefined,
         position: (maxPosition._max.position ?? 0) + 1,
+
         assignees: dto.assigneeIds
-          ? { create: dto.assigneeIds.map((userId) => ({ userId })) }
+          ? {
+              create: dto.assigneeIds.map((userId) => ({
+                userId,
+              })),
+            }
           : undefined,
+
         labels: dto.labelIds
-          ? { create: dto.labelIds.map((labelId) => ({ labelId })) }
+          ? {
+              create: dto.labelIds.map((labelId) => ({
+                labelId,
+              })),
+            }
           : undefined,
       },
       include: TASK_INCLUDE,
@@ -114,7 +150,10 @@ export class TasksService {
     const existing = await this.prisma.task.findFirst({
       where: { id, workspaceId },
     });
-    if (!existing) throw new NotFoundException('Task not found');
+
+    if (!existing) {
+      throw new NotFoundException('Task not found');
+    }
 
     const { assigneeIds, labelIds, dueDateStart, dueDateEnd, ...rest } = dto;
 
@@ -122,22 +161,30 @@ export class TasksService {
       where: { id },
       data: {
         ...rest,
+
         ...(dueDateStart !== undefined && {
           dueDateStart: dueDateStart ? new Date(dueDateStart) : null,
         }),
+
         ...(dueDateEnd !== undefined && {
           dueDateEnd: dueDateEnd ? new Date(dueDateEnd) : null,
         }),
+
         ...(assigneeIds && {
           assignees: {
             deleteMany: {},
-            create: assigneeIds.map((userId) => ({ userId })),
+            create: assigneeIds.map((userId) => ({
+              userId,
+            })),
           },
         }),
+
         ...(labelIds && {
           labels: {
             deleteMany: {},
-            create: labelIds.map((labelId) => ({ labelId })),
+            create: labelIds.map((labelId) => ({
+              labelId,
+            })),
           },
         }),
       },
@@ -153,6 +200,7 @@ export class TasksService {
         dto.priority,
       );
     }
+
     if (dto.statusId && dto.statusId !== existing.statusId) {
       await this.activityService.log(
         id,
@@ -168,16 +216,24 @@ export class TasksService {
 
   async move(workspaceId: string, id: string, dto: MoveTaskDto) {
     await this.ensureExists(workspaceId, id);
+
     return this.prisma.task.update({
       where: { id },
-      data: { statusId: dto.statusId, position: dto.position },
+      data: {
+        statusId: dto.statusId,
+        position: dto.position,
+      },
       include: TASK_INCLUDE,
     });
   }
 
   async remove(workspaceId: string, id: string) {
     await this.ensureExists(workspaceId, id);
-    await this.prisma.task.delete({ where: { id } });
+
+    await this.prisma.task.delete({
+      where: { id },
+    });
+
     return { success: true };
   }
 
@@ -185,7 +241,10 @@ export class TasksService {
     const task = await this.prisma.task.findFirst({
       where: { id, workspaceId },
     });
-    if (!task) throw new NotFoundException('Task not found');
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
   }
 
   async addAssignee(
@@ -195,11 +254,21 @@ export class TasksService {
     actorId: string,
   ) {
     await this.ensureExists(workspaceId, taskId);
+
     await this.prisma.taskAssignee.upsert({
-      where: { taskId_userId: { taskId, userId } },
-      create: { taskId, userId },
+      where: {
+        taskId_userId: {
+          taskId,
+          userId,
+        },
+      },
+      create: {
+        taskId,
+        userId,
+      },
       update: {},
     });
+
     await this.activityService.log(
       taskId,
       actorId,
@@ -207,6 +276,7 @@ export class TasksService {
       undefined,
       userId,
     );
+
     return this.findOne(workspaceId, taskId);
   }
 
@@ -217,7 +287,14 @@ export class TasksService {
     actorId: string,
   ) {
     await this.ensureExists(workspaceId, taskId);
-    await this.prisma.taskAssignee.deleteMany({ where: { taskId, userId } });
+
+    await this.prisma.taskAssignee.deleteMany({
+      where: {
+        taskId,
+        userId,
+      },
+    });
+
     await this.activityService.log(
       taskId,
       actorId,
@@ -225,6 +302,7 @@ export class TasksService {
       userId,
       undefined,
     );
+
     return this.findOne(workspaceId, taskId);
   }
 }
