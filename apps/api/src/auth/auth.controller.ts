@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
@@ -39,7 +32,11 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleCallback(@Req() req: Request, @Res() res: Response) {
     const user = req.user as any;
-    const { token } = this.authService.issueToken(user.id, user.workspaceId, user);
+    const { token } = this.authService.issueToken(
+      user.id,
+      user.workspaceId,
+      user,
+    );
     res.cookie('token', token, COOKIE_OPTS);
     res.redirect(`${process.env.FRONTEND_URL}/tasks`);
   }
@@ -52,7 +49,10 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async me(@CurrentUser() currentUser: { userId: string }) {
-    return this.authService.getCurrentUser(currentUser.userId);
+  async me(
+    @CurrentUser() currentUser: { userId: string; workspaceId: string },
+  ) {
+    const user = await this.authService.getCurrentUser(currentUser.userId);
+    return { ...user, workspaceId: currentUser.workspaceId };
   }
 }
