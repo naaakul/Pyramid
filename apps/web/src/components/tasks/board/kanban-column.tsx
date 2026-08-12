@@ -4,6 +4,7 @@ import { GripVertical, Plus, MoreHorizontal } from "lucide-react";
 import { TaskCard } from "./task-card";
 import { useCreateTask } from "@/hooks/use-tasks";
 import type { ApiStatus, ApiTask } from "@/lib/api/tasks";
+import { useTaskComposerStore } from "@/store/task-composer-store";
 
 export function KanbanColumn({
   status,
@@ -15,6 +16,7 @@ export function KanbanColumn({
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState("");
   const createTask = useCreateTask();
+  const openTask = useTaskComposerStore((s) => s.openTask);
 
   function submit() {
     if (!title.trim()) return setAdding(false);
@@ -46,7 +48,7 @@ export function KanbanColumn({
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}
-        {adding ? (
+        {/* {adding ? (
           <input
             autoFocus
             value={title}
@@ -56,14 +58,14 @@ export function KanbanColumn({
             className="text-sm border rounded px-2 py-1.5 outline-none"
             placeholder="Task title..."
           />
-        ) : (
+        ) : ( */}
           <button
-            onClick={() => setAdding(true)}
+            onClick={() => openTask({ statusId: status.id })}
             className="text-sm text-ink-sec hover:text-ink-400 flex items-center gap-1 px-1 py-1"
           >
             <Plus size={14} /> Add Task
           </button>
-        )}
+        {/* )} */}
       </div>
     </div>
   );

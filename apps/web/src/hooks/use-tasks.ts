@@ -14,6 +14,20 @@ import {
 import {} from "@/lib/api/tasks";
 import { apiFetch } from "@/lib/api/client";
 import { createAttachment, deleteAttachment } from "@/lib/api/tasks";
+import { createTeam, addTaskTeam, removeTaskTeam } from '@/lib/api/tasks';
+
+export function useCreateTeam() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: createTeam, onSuccess: () => qc.invalidateQueries({ queryKey: ['teams'] }) });
+}
+
+export function useToggleTaskTeam(taskId: string) {
+  const qc = useQueryClient();
+  const invalidate = () => qc.invalidateQueries({ queryKey: ['task', taskId] });
+  const add = useMutation({ mutationFn: (teamId: string) => addTaskTeam(taskId, teamId), onSuccess: invalidate });
+  const remove = useMutation({ mutationFn: (teamId: string) => removeTaskTeam(taskId, teamId), onSuccess: invalidate });
+  return { add, remove };
+}
 
 export function useAddAttachment(taskId: string) {
   const qc = useQueryClient();
@@ -128,4 +142,12 @@ export function useToggleAssignee(taskId: string) {
     onSuccess: invalidate,
   });
   return { add, remove };
+}
+
+export function useDeleteLabel() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => apiFetch(`/labels/${id}`, { method: 'DELETE' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['labels'] }),
+  });
 }

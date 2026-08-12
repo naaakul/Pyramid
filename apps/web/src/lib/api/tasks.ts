@@ -15,17 +15,20 @@ export interface ApiUser {
   name: string;
   avatarColor: string | null;
 }
+
 export interface ApiStatus {
   id: string;
   name: string;
   color: string;
   order: number;
 }
+
 export interface ApiLabel {
   id: string;
   name: string;
   color: string;
 }
+
 export interface ApiTask {
   id: string;
   title: string;
@@ -57,6 +60,24 @@ export interface ApiTeam {
   name: string;
 }
 
+// export interface ApiTaskDetail extends ApiTask {
+//   description: string | null;
+//   dueDateStart: string | null;
+//   parentTaskId: string | null;
+//   isLocked: boolean;
+//   status: ApiStatus;
+//   reporter: ApiUser;
+//   teams: { team: ApiTeam }[];
+//   subtasks: ApiTask[];
+//   comments: ApiComment[];
+//   attachments: ApiAttachment[];
+//   activities: ApiActivity[];
+//   watcherCount: number;
+//   parentTask: { id: string; title: string } | null;
+// }
+
+// need to watch
+
 export interface ApiTaskDetail extends ApiTask {
   description: string | null;
   dueDateStart: string | null;
@@ -70,7 +91,80 @@ export interface ApiTaskDetail extends ApiTask {
   attachments: ApiAttachment[];
   activities: ApiActivity[];
   watcherCount: number;
+  parentTask: { id: string; title: string } | null;
+
+  invites: {
+    invitedUser: {
+      id: string;
+    };
+    status: string;
+  }[];
+
+  watchers: {
+    userId: string;
+    viewedAt: string | null;
+  }[];
 }
+
+export interface ApiTeam {
+  id: string;
+  name: string;
+}
+
+export interface ApiLabelFull {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export interface ApiAttachment {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+}
+
+export interface ApiCommentReaction {
+  emoji: string;
+  user: ApiUser;
+}
+
+export interface ApiCommentFull {
+  id: string;
+  body: string;
+  imageUrl: string | null;
+  createdAt: string;
+  author: ApiUser;
+  reactions: ApiCommentReaction[];
+  replies: ApiCommentFull[];
+}
+
+export const getComments = (taskId: string) =>
+  apiFetch<ApiCommentFull[]>(`/tasks/${taskId}/comments`);
+
+export const postComment = (
+  taskId: string,
+  body: string,
+  imageUrl?: string,
+  parentCommentId?: string,
+) =>
+  apiFetch<ApiCommentFull>(`/tasks/${taskId}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ body, imageUrl, parentCommentId }),
+  });
+
+export const deleteComment = (taskId: string, commentId: string) =>
+  apiFetch(`/tasks/${taskId}/comments/${commentId}`, { method: "DELETE" });
+
+export const toggleReaction = (
+  taskId: string,
+  commentId: string,
+  emoji: string,
+) =>
+  apiFetch(
+    `/tasks/${taskId}/comments/${commentId}/reactions/${encodeURIComponent(emoji)}`,
+    { method: "POST" },
+  );
 
 export const getTask = (id: string) => apiFetch<ApiTaskDetail>(`/tasks/${id}`);
 
@@ -116,10 +210,6 @@ export const getTasks = (query: TaskQuery = {}) => {
   return apiFetch<ApiTask[]>(`/tasks${qs ? `?${qs}` : ""}`);
 };
 
-export interface ApiTeam {
-  id: string;
-  name: string;
-}
 export const getTeams = () => apiFetch<ApiTeam[]>("/teams");
 
 export const moveTask = (
@@ -130,12 +220,6 @@ export const moveTask = (
     method: "PATCH",
     body: JSON.stringify(data),
   });
-
-export interface ApiLabelFull {
-  id: string;
-  name: string;
-  color: string;
-}
 
 export const getLabels = () => apiFetch<ApiLabelFull[]>("/labels");
 export const createLabel = (name: string) =>
@@ -154,12 +238,17 @@ export const removeAssignee = (taskId: string, userId: string) =>
     method: "DELETE",
   });
 
-export interface ApiAttachment {
-  id: string;
-  name: string;
-  url: string;
-  type: string;
-}
+export const createTeam = (name: string) =>
+  apiFetch<ApiTeam>("/teams", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+
+export const addTaskTeam = (taskId: string, teamId: string) =>
+  apiFetch(`/tasks/${taskId}/teams/${teamId}`, { method: "POST" });
+
+export const removeTaskTeam = (taskId: string, teamId: string) =>
+  apiFetch(`/tasks/${taskId}/teams/${teamId}`, { method: "DELETE" });
 
 export const createAttachment = (
   taskId: string,

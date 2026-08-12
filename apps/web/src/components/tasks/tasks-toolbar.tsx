@@ -12,6 +12,8 @@ import { useTaskFiltersStore } from "@/store/task-filters-store";
 import type { TaskQuery } from "@/lib/api/tasks";
 import { Plus } from "lucide-react";
 import { NotificationBell } from "./notification-bell";
+import { useTaskComposerStore } from "@/store/task-composer-store";
+import { useSetBreadcrumb } from "@/hooks/use-set-breadcrumb";
 
 export function TasksToolbar({
   initialView,
@@ -23,6 +25,8 @@ export function TasksToolbar({
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
   const filters = useTaskFiltersStore((s) => s.filters);
+  const openTask = useTaskComposerStore((s) => s.openTask);
+  useSetBreadcrumb([{ label: 'Tasks' }]);
 
   const query: TaskQuery = {
     search: debouncedSearch,
@@ -39,7 +43,10 @@ export function TasksToolbar({
           <FieldsPopover />
           <FilterMenu />
           <NotificationBell />
-          <Button className="bg-ink-text text-white hover:bg-ink-700 gap-0">
+          <Button
+            onClick={() => openTask({ projectId })}
+            className="bg-ink-text text-white hover:bg-ink-700 gap-0"
+          >
             <Plus />
             <p className="mb-0.5">Add Task</p>
           </Button>

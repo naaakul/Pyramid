@@ -7,9 +7,9 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { BreadcrumbSlot } from "@/components/layout/breadcrumb-slot";
 import { CurrentUserProvider } from "@/lib/auth/current-user-context";
+import { TaskComposerModal } from "@/components/tasks/task-composer-modal";
 
 export default async function AppLayout({
   children,
@@ -30,6 +30,7 @@ export default async function AppLayout({
             <BreadcrumbSlot />
           </header>
           <div className="flex-1">{children}</div>
+          <TaskComposerModal />
         </SidebarInset>
       </SidebarProvider>
     </CurrentUserProvider>

@@ -1,73 +1,87 @@
 'use client';
 
 import { useState } from 'react';
-import { Eye, Share2, MoreHorizontal, PanelRight } from 'lucide-react';
-import { useUpdateTask } from '@/hooks/use-tasks';
+import { useRouter } from 'next/navigation';
+import { Eye, Share2, MoreHorizontal, PanelRight, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useUpdateTask, useRemoveTask } from '@/hooks/use-tasks';
 import { useTaskPanelStore } from '@/store/task-panel-store';
 import { LockButton } from './lock-button';
+import { ViewModal } from './view-modal';
+import { ShareButton } from './share-button';
+import type { ApiTaskDetail } from '@/lib/api/tasks';
 
 export function TaskDetailHeader({
-  taskId,
-  title,
-  description,
-  watcherCount,
-  isLocked,
-  isReporter,
-}: {
-  taskId: string;
-  title: string;
-  description: string | null;
-  watcherCount: number;
-  isLocked: boolean;
-  isReporter: boolean;
-}) {
-  const updateTask = useUpdateTask(taskId);
+  task, isReporter, isSubtask,
+}: { task: ApiTaskDetail; isReporter: boolean; isSubtask: boolean }) {
+  const router = useRouter();
+  const updateTask = useUpdateTask(task.id);
+  const removeTask = useRemoveTask();
   const togglePanel = useTaskPanelStore((s) => s.toggle);
-  const [localTitle, setLocalTitle] = useState(title);
-  const [localDesc, setLocalDesc] = useState(description ?? '');
+  const [localTitle, setLocalTitle] = useState(task.title);
+  const [localDesc, setLocalDesc] = useState(task.description ?? '');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  function handleDelete() {
+    removeTask.mutate(task.id, {
+      onSuccess: () => router.push(isSubtask && task.parentTaskId ? `/tasks/${task.parentTaskId}` : '/tasks'),
+    });
+  }
 
   return (
     <div className="flex items-start justify-between mb-4">
       <div className="flex-1">
         {isReporter ? (
           <>
-            <input
-              value={localTitle}
-              onChange={(e) => setLocalTitle(e.target.value)}
-              onBlur={() => localTitle !== title && updateTask.mutate({ title: localTitle })}
-              className="text-xl font-semibold w-full outline-none focus:bg-ink-50 rounded px-1 -mx-1"
-            />
-            <textarea
-              value={localDesc}
-              onChange={(e) => setLocalDesc(e.target.value)}
-              onBlur={() => localDesc !== (description ?? '') && updateTask.mutate({ description: localDesc })}
-              rows={2}
-              placeholder="Add a description..."
-              className="text-sm text-ink-500 mt-1 max-w-xl w-full outline-none resize-none focus:bg-ink-50 rounded px-1 -mx-1"
-            />
+            <input value={localTitle} onChange={(e) => setLocalTitle(e.target.value)}
+              onBlur={() => localTitle !== task.title && updateTask.mutate({ title: localTitle })}
+              className="text-xl font-semibold w-full outline-none focus:bg-ink-50 rounded px-1 -mx-1" />
+            <textarea value={localDesc} onChange={(e) => setLocalDesc(e.target.value)}
+              onBlur={() => localDesc !== (task.description ?? '') && updateTask.mutate({ description: localDesc })}
+              rows={2} placeholder="Add a description..."
+              className="text-sm text-ink-500 mt-1 max-w-xl w-full outline-none resize-none focus:bg-ink-50 rounded px-1 -mx-1" />
           </>
         ) : (
           <>
-            <h1 className="text-xl font-semibold">{title}</h1>
-            {description && <p className="text-sm text-ink-500 mt-1 max-w-xl">{description}</p>}
+            <h1 className="text-xl font-semibold">{task.title}</h1>
+            {task.description && <p className="text-sm text-ink-500 mt-1 max-w-xl">{task.description}</p>}
           </>
         )}
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        {isReporter && <LockButton taskId={taskId} isLocked={isLocked} />}
-        <button className="h-8 px-2 border rounded-md flex items-center gap-1 text-ink-500 hover:bg-ink-50 text-xs">
-          <Eye size={14} /> {watcherCount}
-        </button>
+        {!isSubtask && isReporter && <LockButton taskId={task.id} isLocked={task.isLocked} />}
+        {!isSubtask && <ViewModal task={task} isReporter={isReporter} />}
+        {!isSubtask && isReporter && <ShareButton taskId={task.id} />}
         {isReporter && (
-          <>
-            <button className="w-8 h-8 border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50"><Share2 size={14} /></button>
-            <button className="w-8 h-8 border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50"><MoreHorizontal size={14} /></button>
-          </>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="w-8 h-8 border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50">
+              <MoreHorizontal size={14} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="text-red-600 flex items-center gap-2" onClick={() => setConfirmOpen(true)}>
+                <Trash2 size={13} /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
         <button onClick={togglePanel} className="w-8 h-8 bg-ink-100 rounded-md flex items-center justify-center text-ink-600 hover:bg-ink-100/70">
           <PanelRight size={14} />
         </button>
       </div>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete &quot;{task.title}&quot;?</AlertDialogTitle>
+            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

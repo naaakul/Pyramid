@@ -5,6 +5,7 @@ import { ChevronDown, Plus } from 'lucide-react';
 import { TaskRow } from './task-row';
 import type { ColumnDef } from '../shared/column-defs';
 import type { ApiStatus, ApiTask } from '@/lib/api/tasks';
+import { useTaskComposerStore } from '@/store/task-composer-store';
 
 export function TaskGroup({
   status,
@@ -17,6 +18,7 @@ export function TaskGroup({
 }) {
   const [open, setOpen] = useState(true);
   const gridTemplate = `1fr ${columns.map((c) => c.width).join(' ')} 50px`;
+  const openTask = useTaskComposerStore((s) => s.openTask);
 
   return (
     <div className="mb-6">
@@ -43,7 +45,7 @@ export function TaskGroup({
           {tasks.map((task) => (
             <TaskRow key={task.id} task={task} columns={columns} gridTemplate={gridTemplate} />
           ))}
-          <button className="flex items-center gap-1.5 text-sm text-ink-sec hover:text-ink-500 px-4 py-2.5 w-full text-left">
+          <button onClick={() => openTask({ statusId: status.id })} className="flex items-center gap-1.5 text-sm text-ink-sec hover:text-ink-500 px-4 py-2.5 w-full text-left">
             <Plus size={14} /> Add Task
           </button>
         </div>

@@ -10,13 +10,22 @@ export function useCreateInvite() {
 }
 
 export function useAcceptInvite() {
-  const qc = useQueryClient();
   return useMutation({
     mutationFn: acceptInvite,
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['my-invites'] });
-      qc.invalidateQueries({ queryKey: ['workspace-members'] });
-      qc.invalidateQueries({ queryKey: ['tasks'] });
+      window.location.href = '/tasks'; 
     },
   });
 }
+
+// export function useAcceptInvite() {
+//   const qc = useQueryClient();
+//   return useMutation({
+//     mutationFn: acceptInvite,
+//     onSuccess: () => {
+//       qc.invalidateQueries({ queryKey: ['my-invites'] });
+//       qc.invalidateQueries({ queryKey: ['workspace-members'] });
+//       qc.invalidateQueries({ queryKey: ['tasks'] });
+//     },
+//   });
+// }

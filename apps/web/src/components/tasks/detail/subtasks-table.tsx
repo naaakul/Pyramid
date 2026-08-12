@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Plus, MoreHorizontal } from 'lucide-react';
 import { PriorityBadge } from '../shared/priority-badge';
 import { MembersCell } from '../shared/members-cell';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useCreateSubtask, useRemoveTask } from '@/hooks/use-tasks';
+import { useRemoveTask } from '@/hooks/use-tasks';
+import { useTaskComposerStore } from '@/store/task-composer-store';
 import type { ApiTask } from '@/lib/api/tasks';
 
 const GRID = 'grid grid-cols-[1fr_100px_60px_120px_50px] items-center gap-2';
@@ -16,26 +16,9 @@ function formatDate(d: string | null) {
   return new Date(d).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-export function SubtasksTable({
-  parentId,
-  subtasks,
-  isReporter,
-}: {
-  parentId: string;
-  subtasks: ApiTask[];
-  isReporter: boolean;
-}) {
-  const [adding, setAdding] = useState(false);
-  const [title, setTitle] = useState('');
-  const createSubtask = useCreateSubtask(parentId);
+export function SubtasksTable({ parentId, subtasks, isReporter }: { parentId: string; subtasks: ApiTask[]; isReporter: boolean }) {
   const removeTask = useRemoveTask();
-
-  function submit() {
-    if (!title.trim()) return setAdding(false);
-    createSubtask.mutate({ title });
-    setTitle('');
-    setAdding(false);
-  }
+  const openSubtask = useTaskComposerStore((s) => s.openSubtask);
 
   return (
     <div className="border rounded-lg overflow-hidden mb-4">
@@ -51,34 +34,19 @@ export function SubtasksTable({
           <span className="text-ink-600 text-xs">{formatDate(task.dueDateEnd)}</span>
           {isReporter ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-ink-400 hover:text-ink-600 justify-self-end">
-                <MoreHorizontal size={16} />
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger className="text-ink-400 hover:text-ink-600 justify-self-end"><MoreHorizontal size={16} /></DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem className="text-red-600" onClick={() => removeTask.mutate(task.id)}>
-                  Delete
-                </DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600" onClick={() => removeTask.mutate(task.id)}>Delete</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : <span />}
         </div>
       ))}
-      {isReporter &&
-        (adding ? (
-          <input
-            autoFocus
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={submit}
-            onKeyDown={(e) => e.key === 'Enter' && submit()}
-            placeholder="Subtask title..."
-            className="w-full text-sm px-3 py-2.5 outline-none"
-          />
-        ) : (
-          <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-700 px-3 py-2.5 w-full text-left">
-            <Plus size={14} /> Add Subtasks
-          </button>
-        ))}
+      {isReporter && (
+        <button onClick={() => openSubtask(parentId)} className="flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-700 px-3 py-2.5 w-full text-left">
+          <Plus size={14} /> Add Subtasks
+        </button>
+      )}
     </div>
   );
 }
