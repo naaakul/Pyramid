@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { getCurrentUser } from "@/lib/api/auth";
 import { ThemeProvider } from "@/lib/theme/theme-provider";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
           </ThemeProvider>
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

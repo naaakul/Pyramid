@@ -12,6 +12,36 @@ import {
   type ApiTaskDetail,
 } from "@/lib/api/tasks";
 import {} from "@/lib/api/tasks";
+import { apiFetch } from "@/lib/api/client";
+import { createAttachment, deleteAttachment } from "@/lib/api/tasks";
+
+export function useAddAttachment(taskId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string; url: string; type: "link" | "file" }) =>
+      createAttachment(taskId, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["task", taskId] }),
+  });
+}
+
+export function useRemoveAttachment(taskId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteAttachment(taskId, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["task", taskId] }),
+  });
+}
+
+export function useRemoveTask() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => apiFetch(`/tasks/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      qc.invalidateQueries({ queryKey: ["task"] });
+    },
+  });
+}
 
 export const useStatuses = () =>
   useQuery({ queryKey: ["statuses"], queryFn: getStatuses });

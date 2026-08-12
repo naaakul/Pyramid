@@ -11,6 +11,7 @@ import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useTaskFiltersStore } from "@/store/task-filters-store";
 import type { TaskQuery } from "@/lib/api/tasks";
 import { Plus } from "lucide-react";
+import { NotificationBell } from "./notification-bell";
 
 export function TasksToolbar({
   initialView,
@@ -37,6 +38,7 @@ export function TasksToolbar({
           <SearchBar value={search} onChange={setSearch} />
           <FieldsPopover />
           <FilterMenu />
+          <NotificationBell />
           <Button className="bg-ink-text text-white hover:bg-ink-700 gap-0">
             <Plus />
             <p className="mb-0.5">Add Task</p>

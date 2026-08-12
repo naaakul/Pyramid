@@ -1,26 +1,37 @@
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
-import { getCurrentUser } from '@/lib/api/auth';
-import { AppSidebar } from '@/components/sidebar/app-sidebar';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
-import { Separator } from '@/components/ui/separator';
-import { BreadcrumbSlot } from '@/components/layout/breadcrumb-slot';
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/api/auth";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { BreadcrumbSlot } from "@/components/layout/breadcrumb-slot";
+import { CurrentUserProvider } from "@/lib/auth/current-user-context";
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const cookieStore = await cookies();
   const user = await getCurrentUser(cookieStore.toString());
-  if (!user) redirect('/login');
+  if (!user) redirect("/login");
 
   return (
-    <SidebarProvider>
-      <AppSidebar user={user} />
-      <SidebarInset>
-        <header className="flex h-12 items-center gap-2 px-4 border-b border-ink-border pl-2">
-          <SidebarTrigger className='text-ink-text hover:text-ink-700 hover:bg-ink-bg' />
-          <BreadcrumbSlot />
-        </header>
-        <div className="flex-1">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <CurrentUserProvider user={user}>
+      <SidebarProvider>
+        <AppSidebar user={user} />
+        <SidebarInset>
+          <header className="flex h-12 items-center gap-2 px-4 border-b border-ink-border pl-2">
+            <SidebarTrigger className="text-ink-text hover:text-ink-700 hover:bg-ink-bg" />
+            <BreadcrumbSlot />
+          </header>
+          <div className="flex-1">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </CurrentUserProvider>
   );
 }
