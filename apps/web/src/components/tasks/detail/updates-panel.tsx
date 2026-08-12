@@ -3,9 +3,23 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import type { ApiActivity } from '@/lib/api/tasks';
 
 const ACTIVITY_LABEL: Record<string, (a: ApiActivity) => string> = {
+  TITLE_CHANGED: (a) => `renamed the task to "${a.toValue}"`,
+  DESCRIPTION_CHANGED: () => `updated the description`,
   PRIORITY_CHANGED: (a) => `changed priority from ${a.fromValue ?? 'No priority'} to ${a.toValue}`,
-  STATUS_CHANGED: (a) => `changed status`,
-  COMMENT_ADDED: () => `posted an update`,
+  STATUS_CHANGED: () => `changed status`,
+  DUE_DATE_CHANGED: () => `updated the due date`,
+  ASSIGNEE_ADDED: () => `added a member`,
+  ASSIGNEE_REMOVED: () => `removed a member`,
+  LABEL_ADDED: () => `added a label`,
+  LABEL_REMOVED: () => `removed a label`,
+  TEAM_ADDED: (a) => `added team "${a.toValue}"`,
+  TEAM_REMOVED: (a) => `removed team "${a.fromValue}"`,
+  LOCKED: () => `locked the task`,
+  UNLOCKED: () => `unlocked the task`,
+  SUBTASK_ADDED: (a) => `added subtask "${a.toValue}"`,
+  SUBTASK_DELETED: (a) => `deleted subtask "${a.fromValue}"`,
+  ATTACHMENT_ADDED: (a) => `added resource "${a.toValue}"`,
+  COMMENT_ADDED: () => `posted a comment`,
 };
 
 export function UpdatesPanel({ activities }: { activities: ApiActivity[] }) {

@@ -261,3 +261,6 @@ export const createAttachment = (
 
 export const deleteAttachment = (taskId: string, id: string) =>
   apiFetch(`/tasks/${taskId}/attachments/${id}`, { method: "DELETE" });
+
+export const getTaskAssignees = (taskId: string) =>
+  apiFetch<ApiUser[]>(`/tasks/${taskId}/assignees`);

@@ -10,22 +10,32 @@ import {
   getTeams,
   type TaskQuery,
   type ApiTaskDetail,
+  getTaskAssignees,
 } from "@/lib/api/tasks";
 import {} from "@/lib/api/tasks";
 import { apiFetch } from "@/lib/api/client";
 import { createAttachment, deleteAttachment } from "@/lib/api/tasks";
-import { createTeam, addTaskTeam, removeTaskTeam } from '@/lib/api/tasks';
+import { createTeam, addTaskTeam, removeTaskTeam } from "@/lib/api/tasks";
 
 export function useCreateTeam() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: createTeam, onSuccess: () => qc.invalidateQueries({ queryKey: ['teams'] }) });
+  return useMutation({
+    mutationFn: createTeam,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["teams"] }),
+  });
 }
 
 export function useToggleTaskTeam(taskId: string) {
   const qc = useQueryClient();
-  const invalidate = () => qc.invalidateQueries({ queryKey: ['task', taskId] });
-  const add = useMutation({ mutationFn: (teamId: string) => addTaskTeam(taskId, teamId), onSuccess: invalidate });
-  const remove = useMutation({ mutationFn: (teamId: string) => removeTaskTeam(taskId, teamId), onSuccess: invalidate });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["task", taskId] });
+  const add = useMutation({
+    mutationFn: (teamId: string) => addTaskTeam(taskId, teamId),
+    onSuccess: invalidate,
+  });
+  const remove = useMutation({
+    mutationFn: (teamId: string) => removeTaskTeam(taskId, teamId),
+    onSuccess: invalidate,
+  });
   return { add, remove };
 }
 
@@ -131,6 +141,7 @@ export function useToggleAssignee(taskId: string) {
   const qc = useQueryClient();
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["task", taskId] });
+    qc.invalidateQueries({ queryKey: ["task-assignees", taskId] });
     qc.invalidateQueries({ queryKey: ["tasks"] });
   };
   const add = useMutation({
@@ -147,7 +158,14 @@ export function useToggleAssignee(taskId: string) {
 export function useDeleteLabel() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => apiFetch(`/labels/${id}`, { method: 'DELETE' }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['labels'] }),
+    mutationFn: (id: string) => apiFetch(`/labels/${id}`, { method: "DELETE" }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["labels"] }),
   });
 }
+
+export const useTaskAssignees = (taskId: string) =>
+  useQuery({
+    queryKey: ["task-assignees", taskId],
+    queryFn: () => getTaskAssignees(taskId),
+    enabled: !!taskId,
+  });
