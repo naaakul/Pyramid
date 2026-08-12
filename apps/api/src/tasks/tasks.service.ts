@@ -27,28 +27,37 @@ export class TasksService {
     private activityService: ActivityService,
   ) {}
 
-  findAll(workspaceId: string, query: QueryTasksDto) {
+  findAll(userId: string, workspaceId: string, query: QueryTasksDto) {
     return this.prisma.task.findMany({
       where: {
-        workspaceId,
         parentTaskId: null,
-        ...(query.search && {
-          title: { contains: query.search, mode: 'insensitive' as const },
-        }),
-        ...(query.statusId && { statusId: query.statusId }),
-        ...(query.priority && { priority: query.priority }),
-        ...(query.projectId && { projectId: query.projectId }),
-        ...(query.assigneeId && {
-          assignees: { some: { userId: query.assigneeId } },
-        }),
-        ...(query.labelId && {
-          labels: { some: { labelId: query.labelId } },
-        }),
-        ...(query.reporterId && { reporterId: query.reporterId }),
-        ...(query.dueDate === 'overdue' && {
-          dueDateEnd: { lt: new Date() },
-        }),
-        ...(query.dueDate === 'no_date' && { dueDateEnd: null }),
+        AND: [
+          { OR: [{ workspaceId }, { assignees: { some: { userId } } }] },
+          ...(query.search
+            ? [
+                {
+                  title: {
+                    contains: query.search,
+                    mode: 'insensitive' as const,
+                  },
+                },
+              ]
+            : []),
+          ...(query.statusId ? [{ statusId: query.statusId }] : []),
+          ...(query.priority ? [{ priority: query.priority }] : []),
+          ...(query.projectId ? [{ projectId: query.projectId }] : []),
+          ...(query.assigneeId
+            ? [{ assignees: { some: { userId: query.assigneeId } } } as const]
+            : []),
+          ...(query.labelId
+            ? [{ labels: { some: { labelId: query.labelId } } } as const]
+            : []),
+          ...(query.reporterId ? [{ reporterId: query.reporterId }] : []),
+          ...(query.dueDate === 'overdue'
+            ? [{ dueDateEnd: { lt: new Date() } }]
+            : []),
+          ...(query.dueDate === 'no_date' ? [{ dueDateEnd: null }] : []),
+        ],
       },
       include: TASK_INCLUDE,
       orderBy: { position: 'asc' },
@@ -57,7 +66,14 @@ export class TasksService {
 
   async findOne(workspaceId: string, id: string, requesterId: string) {
     const task = await this.prisma.task.findFirst({
-      where: { id, workspaceId },
+      where: {
+        id,
+        OR: [
+          { workspaceId },
+          { assignees: { some: { userId: requesterId } } },
+          { reporterId: requesterId },
+        ],
+      },
       include: {
         ...TASK_INCLUDE,
         parentTask: { select: { id: true, title: true } },
@@ -81,11 +97,9 @@ export class TasksService {
     if (task.parentTaskId) {
       const isReporter = task.reporterId === requesterId;
       const isAssignee = task.assignees.some((a) => a.userId === requesterId);
-      if (!isReporter && !isAssignee) {
+      if (!isReporter && !isAssignee)
         throw new ForbiddenException('You are not a member of this subtask');
-      }
     }
-
     return task;
   }
 

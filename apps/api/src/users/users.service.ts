@@ -10,25 +10,40 @@ export class UsersService {
     return this.prisma.user.update({ where: { id: userId }, data: dto });
   }
 
-  async searchByEmail(workspaceId: string, excludeUserId: string, email: string) {
-  const existingMemberIds = (
-    await this.prisma.workspaceMember.findMany({ where: { workspaceId }, select: { userId: true } })
-  ).map((m) => m.userId);
+  async searchByEmail(excludeUserId: string, email: string, taskId?: string) {
+    let excludeIds = [excludeUserId];
 
-  const pendingInviteUserIds = (
-    await this.prisma.workspaceInvite.findMany({
-      where: { workspaceId, status: 'PENDING' },
-      select: { invitedUserId: true },
-    })
-  ).map((i) => i.invitedUserId);
+    if (taskId) {
+      const [assignees, pendingInvites] = await Promise.all([
+        this.prisma.taskAssignee.findMany({
+          where: { taskId },
+          select: { userId: true },
+        }),
+        this.prisma.workspaceInvite.findMany({
+          where: { taskId, status: 'PENDING' },
+          select: { invitedUserId: true },
+        }),
+      ]);
+      excludeIds = [
+        ...excludeIds,
+        ...assignees.map((a) => a.userId),
+        ...pendingInvites.map((i) => i.invitedUserId),
+      ];
+    }
 
-  return this.prisma.user.findMany({
-    where: {
-      email: { contains: email, mode: 'insensitive' },
-      id: { notIn: [...existingMemberIds, ...pendingInviteUserIds] },
-    },
-    select: { id: true, name: true, email: true, avatarColor: true, avatarUrl: true },
-    take: 10,
-  });
-}
+    return this.prisma.user.findMany({
+      where: {
+        email: { contains: email, mode: 'insensitive' },
+        id: { notIn: excludeIds },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarColor: true,
+        avatarUrl: true,
+      },
+      take: 10,
+    });
+  }
 }

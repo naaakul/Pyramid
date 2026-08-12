@@ -28,7 +28,7 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get() findAll(@CurrentUser() u: AuthUser, @Query() q: QueryTasksDto) {
-    return this.tasksService.findAll(u.workspaceId, q);
+    return this.tasksService.findAll(u.userId, u.workspaceId, q);
   }
   @Post() create(@CurrentUser() u: AuthUser, @Body() dto: CreateTaskDto) {
     return this.tasksService.create(u.workspaceId, u.userId, dto);
@@ -86,7 +86,7 @@ export class TasksController {
   ) {
     return this.tasksService.addTeam(u.workspaceId, id, teamId, u.userId);
   }
-  
+
   @Delete(':id/teams/:teamId')
   removeTeam(
     @CurrentUser() u: AuthUser,

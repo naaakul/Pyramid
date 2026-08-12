@@ -10,13 +10,20 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get('search')
-  search(@CurrentUser() u: { userId: string; workspaceId: string }, @Query('email') email: string) {
+  search(
+    @CurrentUser() u: { userId: string; workspaceId: string },
+    @Query('email') email: string,
+    @Query('taskId') taskId?: string,
+  ) {
     if (!email || email.length < 3) return [];
-    return this.usersService.searchByEmail(u.workspaceId, u.userId, email);
+    return this.usersService.searchByEmail(u.userId, email, taskId);
   }
 
   @Patch('me/preferences')
-  updatePreferences(@CurrentUser() u: { userId: string }, @Body() dto: UpdatePreferencesDto) {
+  updatePreferences(
+    @CurrentUser() u: { userId: string },
+    @Body() dto: UpdatePreferencesDto,
+  ) {
     return this.usersService.updatePreferences(u.userId, dto);
   }
 }
