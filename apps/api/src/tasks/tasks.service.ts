@@ -88,6 +88,7 @@ export class TasksService {
       include: {
         ...TASK_INCLUDE,
         parentTask: { select: { id: true, title: true } },
+        project: { select: { id: true, name: true } },
         subtasks: { include: TASK_INCLUDE },
         comments: true,
         attachments: true,
