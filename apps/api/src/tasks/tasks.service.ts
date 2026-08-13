@@ -224,6 +224,17 @@ export class TasksService {
   }
 
   async create(workspaceId: string, reporterId: string, dto: CreateTaskDto) {
+    if (dto.projectId) {
+      const project = await this.prisma.project.findUnique({
+        where: { id: dto.projectId },
+      });
+      if (!project) throw new NotFoundException('Project not found');
+      if (project.leadId !== reporterId) {
+        throw new ForbiddenException(
+          'Only the project lead can create tasks in this project',
+        );
+      }
+    }
     let statusId = dto.statusId;
     if (!statusId) {
       const defaultStatus = await this.prisma.status.findFirst({
