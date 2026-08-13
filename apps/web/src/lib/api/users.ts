@@ -8,7 +8,11 @@ export interface SearchedUser {
   avatarUrl: string | null;
 }
 
-export const searchUsersByEmail = (email: string, taskId?: string) =>
+export const searchUsersByEmail = (
+  email: string,
+  taskId?: string,
+  projectId?: string,
+) =>
   apiFetch<SearchedUser[]>(
-    `/users/search?email=${encodeURIComponent(email)}${taskId ? `&taskId=${taskId}` : ""}`,
+    `/users/search?email=${encodeURIComponent(email)}${taskId ? `&taskId=${taskId}` : ""}${projectId ? `&projectId=${projectId}` : ""}`,
   );

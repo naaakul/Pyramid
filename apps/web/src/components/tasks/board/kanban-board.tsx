@@ -3,7 +3,7 @@ import { useStatuses, useTasks } from '@/hooks/use-tasks';
 import { KanbanColumn } from './kanban-column';
 import type { TaskQuery } from '@/lib/api/tasks';
 
-export function KanbanBoard({ query }: { query: TaskQuery }) {
+export function KanbanBoard({ query, projectId }: { query: TaskQuery; projectId?: string }) {
   const { data: statuses, isLoading: statusesLoading } = useStatuses();
   const { data: tasks, isLoading: tasksLoading } = useTasks(query);
 
@@ -13,11 +13,8 @@ export function KanbanBoard({ query }: { query: TaskQuery }) {
   return (
     <div className="flex gap-4 overflow-x-auto p-6 pt-0">
       {statuses.map((status) => (
-        <KanbanColumn
-          key={status.id}
-          status={status}
-          tasks={(tasks ?? []).filter((t) => t.status.name === status.name)}
-        />
+        <KanbanColumn key={status.id} status={status} projectId={projectId}
+          tasks={(tasks ?? []).filter((t) => t.status.name === status.name)} />
       ))}
     </div>
   );

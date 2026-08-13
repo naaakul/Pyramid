@@ -7,6 +7,7 @@ import { SearchBar } from '@/components/tasks/search-bar';
 import { ProjectTable } from '@/components/projects/project-table';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useProjectComposerStore } from '@/store/project-composer-store';
+import { NotificationBell } from '@/components/tasks/notification-bell';
 
 export default function ProjectsPage() {
   const [search, setSearch] = useState('');
@@ -25,6 +26,7 @@ export default function ProjectsPage() {
           <Button variant="outline" size="icon" disabled className="opacity-50">
             <SlidersHorizontal size={16} />
           </Button>
+          <NotificationBell type="project" />
           <Button size="sm" className="bg-black text-white hover:bg-gray-800" onClick={openComposer}>
             + Add Task
           </Button>

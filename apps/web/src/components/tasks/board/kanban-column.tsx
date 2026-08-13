@@ -9,9 +9,11 @@ import { useTaskComposerStore } from "@/store/task-composer-store";
 export function KanbanColumn({
   status,
   tasks,
+  projectId,
 }: {
   status: ApiStatus;
   tasks: ApiTask[];
+  projectId?: string;
 }) {
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState("");
@@ -59,12 +61,12 @@ export function KanbanColumn({
             placeholder="Task title..."
           />
         ) : ( */}
-          <button
-            onClick={() => openTask({ statusId: status.id })}
-            className="text-sm text-ink-sec hover:text-ink-400 flex items-center gap-1 px-1 py-1"
-          >
-            <Plus size={14} /> Add Task
-          </button>
+        <button
+          onClick={() => openTask({ statusId: status.id, projectId })}
+          className="..."
+        >
+          <Plus size={14} /> Add Task
+        </button>
         {/* )} */}
       </div>
     </div>

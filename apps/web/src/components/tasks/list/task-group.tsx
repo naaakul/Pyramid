@@ -11,10 +11,12 @@ export function TaskGroup({
   status,
   tasks,
   columns,
+  projectId,
 }: {
   status: ApiStatus;
   tasks: ApiTask[];
   columns: ColumnDef[];
+  projectId?: string;
 }) {
   const [open, setOpen] = useState(true);
   const gridTemplate = `1fr ${columns.map((c) => c.width).join(' ')} 50px`;
@@ -26,7 +28,10 @@ export function TaskGroup({
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 text-sm font-medium text-ink-text mb-2"
       >
-        <ChevronDown size={16} className={`transition-transform ${open ? '' : '-rotate-90'}`} />
+        <ChevronDown
+          size={16}
+          className={`transition-transform ${open ? '' : '-rotate-90'}`}
+        />
         {status.name}
       </button>
 
@@ -37,15 +42,27 @@ export function TaskGroup({
             style={{ gridTemplateColumns: gridTemplate }}
           >
             <span>Task</span>
+
             {columns.map((col) => (
               <span key={col.key}>{col.label}</span>
             ))}
+
             <span className="justify-self-end">Actions</span>
           </div>
+
           {tasks.map((task) => (
-            <TaskRow key={task.id} task={task} columns={columns} gridTemplate={gridTemplate} />
+            <TaskRow
+              key={task.id}
+              task={task}
+              columns={columns}
+              gridTemplate={gridTemplate}
+            />
           ))}
-          <button onClick={() => openTask({ statusId: status.id })} className="flex items-center gap-1.5 text-sm text-ink-sec hover:text-ink-500 px-4 py-2.5 w-full text-left">
+
+          <button
+            onClick={() => openTask({ statusId: status.id, projectId })}
+            className="flex items-center gap-1.5 text-sm text-ink-sec hover:text-ink-500 px-4 py-2.5 w-full text-left"
+          >
             <Plus size={14} /> Add Task
           </button>
         </div>

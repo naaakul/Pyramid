@@ -26,7 +26,7 @@ export function TasksToolbar({
   const debouncedSearch = useDebouncedValue(search, 300);
   const filters = useTaskFiltersStore((s) => s.filters);
   const openTask = useTaskComposerStore((s) => s.openTask);
-  useSetBreadcrumb([{ label: 'Tasks' }]);
+  useSetBreadcrumb([{ label: "Tasks" }]);
 
   const query: TaskQuery = {
     search: debouncedSearch,
@@ -42,7 +42,7 @@ export function TasksToolbar({
           <SearchBar value={search} onChange={setSearch} />
           <FieldsPopover />
           <FilterMenu />
-          <NotificationBell />
+          <NotificationBell type="task" />
           <Button
             onClick={() => openTask({ projectId })}
             className="bg-ink-text text-white hover:bg-ink-700 gap-0"
@@ -53,9 +53,9 @@ export function TasksToolbar({
         </div>
       </div>
       {initialView === "list" ? (
-        <TaskListView query={query} />
+        <TaskListView query={query} projectId={projectId} />
       ) : (
-        <KanbanBoard query={query} />
+        <KanbanBoard query={query} projectId={projectId} />
       )}
     </div>
   );

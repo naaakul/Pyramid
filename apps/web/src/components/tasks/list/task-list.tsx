@@ -6,29 +6,50 @@ import { getVisibleColumns } from '../shared/column-defs';
 import { TaskGroup } from './task-group';
 import type { TaskQuery } from '@/lib/api/tasks';
 
-export function TaskListView({ query }: { query: TaskQuery }) {
+export function TaskListView({
+  query,
+  projectId,
+}: {
+  query: TaskQuery;
+  projectId?: string;
+}) {
   const { data: statuses, isLoading: statusesLoading } = useStatuses();
   const { data: tasks, isLoading: tasksLoading } = useTasks(query);
   const visible = useBoardFieldsStore((s) => s.visible);
   const columns = getVisibleColumns(visible);
 
-  if (statusesLoading || tasksLoading) return <div className="p-6 text-sm text-ink-500">Loading...</div>;
+  if (statusesLoading || tasksLoading) {
+    return <div className="p-6 text-sm text-ink-500">Loading...</div>;
+  }
 
   const groups = (statuses ?? []).map((status) => ({
     status,
     tasks: (tasks ?? []).filter((t) => t.status.name === status.name),
   }));
+
   const hasActiveFilter = Object.values(query).some(Boolean);
-  const visibleGroups = hasActiveFilter ? groups.filter((g) => g.tasks.length > 0) : groups;
+  const visibleGroups = hasActiveFilter
+    ? groups.filter((g) => g.tasks.length > 0)
+    : groups;
 
   if (hasActiveFilter && visibleGroups.length === 0) {
-    return <div className="px-6 py-16 text-center text-sm text-ink-400">No tasks match these filters</div>;
+    return (
+      <div className="px-6 py-16 text-center text-sm text-ink-400">
+        No tasks match these filters
+      </div>
+    );
   }
 
   return (
     <div className="px-6 pb-6">
       {visibleGroups.map(({ status, tasks }) => (
-        <TaskGroup key={status.id} status={status} tasks={tasks} columns={columns} />
+        <TaskGroup
+          key={status.id}
+          status={status}
+          tasks={tasks}
+          columns={columns}
+          projectId={projectId}
+        />
       ))}
     </div>
   );

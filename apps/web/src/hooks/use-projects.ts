@@ -1,5 +1,6 @@
 "use client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api/client";
 import {
   getProjects,
   getProject,
@@ -13,12 +14,22 @@ export const useProjects = (search?: string) =>
     queryKey: ["projects", search],
     queryFn: () => getProjects(search),
   });
+
 export const useProject = (id: string, initialData?: ApiProject) =>
   useQuery({
     queryKey: ["project", id],
     queryFn: () => getProject(id),
     initialData,
   });
+
+export function useRemoveProject() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiFetch(`/projects/${id}`, { method: "DELETE" }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["projects"] }),
+  });
+}
 
 export function useCreateProject() {
   const qc = useQueryClient();

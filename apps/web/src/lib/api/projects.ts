@@ -8,6 +8,7 @@ export interface ApiProject {
   leadId: string | null;
   lead: ApiUser | null;
   dueDate: string | null;
+  members?: { user: ApiUser }[];
   _count?: { tasks: number };
 }
 
