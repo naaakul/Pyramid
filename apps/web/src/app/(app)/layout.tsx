@@ -10,6 +10,7 @@ import {
 import { BreadcrumbSlot } from "@/components/layout/breadcrumb-slot";
 import { CurrentUserProvider } from "@/lib/auth/current-user-context";
 import { TaskComposerModal } from "@/components/tasks/task-composer-modal";
+import { ProjectCreateModal } from "@/components/projects/project-create-modal";
 
 export default async function AppLayout({
   children,
@@ -31,6 +32,7 @@ export default async function AppLayout({
           </header>
           <div className="flex-1">{children}</div>
           <TaskComposerModal />
+          <ProjectCreateModal />
         </SidebarInset>
       </SidebarProvider>
     </CurrentUserProvider>

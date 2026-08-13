@@ -28,6 +28,7 @@ export function TaskDetailClient({
 
   const isReporter = task.reporter.id === currentUser.id;
   const isSubtask = task.parentTaskId !== null;
+  const isProjectTask = task.projectId !== null;
 
   return (
     <div className="flex gap-6 p-6 max-w-6xl mx-auto">
@@ -38,12 +39,11 @@ export function TaskDetailClient({
           task={task}
           isReporter={isReporter}
           isSubtask={isSubtask}
+          isProjectTask={isProjectTask}
         />
-        <TaskProperties
-          assignee={task.assignees[0]?.user ?? null}
-          dueDateEnd={task.dueDateEnd}
-          teams={task.teams}
-        />
+        {!isSubtask && (
+          <TaskProperties dueDateEnd={task.dueDateEnd} teams={task.teams} />
+        )}
         {!isSubtask && (
           <TaskLabels
             labels={task.labels}
@@ -58,20 +58,18 @@ export function TaskDetailClient({
             editable={isReporter}
           />
         )}
-        {!isSubtask && (
+        {!isSubtask && !isProjectTask && (
           <SubtasksTable
             parentId={task.id}
             subtasks={task.subtasks}
             isReporter={isReporter}
           />
         )}
-        {!isSubtask && (
-          <CommentsSection
-            taskId={task.id}
-            isReporter={isReporter}
-            isLocked={task.isLocked}
-          />
-        )}
+        <CommentsSection
+          taskId={task.id}
+          isReporter={isReporter}
+          isLocked={task.isLocked}
+        />
       </div>
       {panelOpen && (
         <div className="w-72 shrink-0">
@@ -79,6 +77,7 @@ export function TaskDetailClient({
             task={task}
             isReporter={isReporter}
             isSubtask={isSubtask}
+            isProjectTask={isProjectTask}
           />
           {!isSubtask && <UpdatesPanel activities={task.activities} />}
         </div>

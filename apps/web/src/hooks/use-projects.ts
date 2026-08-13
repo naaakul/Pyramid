@@ -20,6 +20,7 @@ export const useProject = (id: string, initialData?: ApiProject) =>
     queryKey: ["project", id],
     queryFn: () => getProject(id),
     initialData,
+    enabled: !!id,
   });
 
 export function useRemoveProject() {

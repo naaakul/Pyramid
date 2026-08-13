@@ -11,21 +11,14 @@ import { useUpdateTask } from "@/hooks/use-tasks";
 import type { ApiTaskDetail } from "@/lib/api/tasks";
 import { TeamSelect } from "./team-select";
 
-export function DetailsPanel({
-  task,
-  isReporter,
-  isSubtask,
-}: {
-  task: ApiTaskDetail;
-  isReporter: boolean;
-  isSubtask: boolean;
+export function DetailsPanel({ task, isReporter, isSubtask, isProjectTask }: {
+  task: ApiTaskDetail; isReporter: boolean; isSubtask: boolean; isProjectTask: boolean;
 }) {
   const updateTask = useUpdateTask(task.id);
 
   return (
     <div className="border rounded-lg p-3 mb-4">
-      <CollapsibleSection
-        title="Details"
+      <CollapsibleSection title="Details"
         actions={
           isReporter && (
             <div className="flex items-center gap-1 text-ink-400">
@@ -68,17 +61,12 @@ export function DetailsPanel({
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-ink-500">Members</span>
-            {isReporter ? (
-              <AddMembersModal taskId={task.id} assignees={task.assignees} />
-            ) : (
-              <span className="text-ink-700">
-                {task.assignees.length} member
-                {task.assignees.length !== 1 && "s"}
-              </span>
-            )}
-          </div>
+          {!isProjectTask && (
+            <div className="flex items-center justify-between">
+              <span className="text-ink-500">Members</span>
+              {isReporter ? <AddMembersModal taskId={task.id} assignees={task.assignees} /> : <span className="text-ink-700">{task.assignees.length} member{task.assignees.length !== 1 && 's'}</span>}
+            </div>
+          )}
 
           {!isSubtask && (
             <div className="flex items-center justify-between">

@@ -12,9 +12,9 @@ import { ViewModal } from './view-modal';
 import { ShareButton } from './share-button';
 import type { ApiTaskDetail } from '@/lib/api/tasks';
 
-export function TaskDetailHeader({
-  task, isReporter, isSubtask,
-}: { task: ApiTaskDetail; isReporter: boolean; isSubtask: boolean }) {
+export function TaskDetailHeader({ task, isReporter, isSubtask, isProjectTask }: {
+  task: ApiTaskDetail; isReporter: boolean; isSubtask: boolean; isProjectTask: boolean;
+}) {
   const router = useRouter();
   const updateTask = useUpdateTask(task.id);
   const removeTask = useRemoveTask();
@@ -22,6 +22,7 @@ export function TaskDetailHeader({
   const [localTitle, setLocalTitle] = useState(task.title);
   const [localDesc, setLocalDesc] = useState(task.description ?? '');
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const showViewShare = !isSubtask && !isProjectTask;
 
   function handleDelete() {
     removeTask.mutate(task.id, {
@@ -51,8 +52,8 @@ export function TaskDetailHeader({
       </div>
       <div className="flex items-center gap-2 shrink-0">
         {!isSubtask && isReporter && <LockButton taskId={task.id} isLocked={task.isLocked} />}
-        {!isSubtask && <ViewModal task={task} isReporter={isReporter} />}
-        {!isSubtask && isReporter && <ShareButton taskId={task.id} />}
+        {showViewShare && <ViewModal task={task} isReporter={isReporter} />}
+        {showViewShare && isReporter && <ShareButton taskId={task.id} />}
         {isReporter && (
           <DropdownMenu>
             <DropdownMenuTrigger className="w-8 h-8 border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50">
@@ -65,9 +66,7 @@ export function TaskDetailHeader({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        <button onClick={togglePanel} className="w-8 h-8 bg-ink-100 rounded-md flex items-center justify-center text-ink-600 hover:bg-ink-100/70">
-          <PanelRight size={14} />
-        </button>
+        <button onClick={togglePanel} className="w-8 h-8 bg-ink-100 rounded-md flex items-center justify-center text-ink-600 hover:bg-ink-100/70"><PanelRight size={14} /></button>
       </div>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>

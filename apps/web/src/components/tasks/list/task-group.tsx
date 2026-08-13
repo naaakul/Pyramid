@@ -12,11 +12,13 @@ export function TaskGroup({
   tasks,
   columns,
   projectId,
+  canCreateTask = true,
 }: {
   status: ApiStatus;
   tasks: ApiTask[];
   columns: ColumnDef[];
   projectId?: string;
+  canCreateTask?: boolean;
 }) {
   const [open, setOpen] = useState(true);
   const gridTemplate = `1fr ${columns.map((c) => c.width).join(' ')} 50px`;
@@ -59,12 +61,15 @@ export function TaskGroup({
             />
           ))}
 
-          <button
-            onClick={() => openTask({ statusId: status.id, projectId })}
-            className="flex items-center gap-1.5 text-sm text-ink-sec hover:text-ink-500 px-4 py-2.5 w-full text-left"
-          >
-            <Plus size={14} /> Add Task
-          </button>
+          {canCreateTask && (
+            <button
+              onClick={() => openTask({ statusId: status.id, projectId })}
+              className="flex items-center gap-1.5 text-sm text-ink-sec hover:text-ink-500 px-4 py-2.5 w-full text-left"
+            >
+              <Plus size={14} />
+              Add Task
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -29,16 +29,6 @@ export interface ApiLabel {
   color: string;
 }
 
-export interface ApiTask {
-  id: string;
-  title: string;
-  priority: string;
-  statusId: string;
-  dueDateEnd: string | null;
-  assignees: { user: ApiUser }[];
-  labels: { label: ApiLabel }[];
-}
-
 export interface ApiComment {
   id: string;
   body: string;
@@ -58,6 +48,7 @@ export interface ApiActivity {
 export interface ApiTask {
   id: string;
   workspaceId: string;
+  projectId: string | null;
   title: string;
   priority: string;
   statusId: string;

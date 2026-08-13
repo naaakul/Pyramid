@@ -9,9 +9,11 @@ import type { TaskQuery } from '@/lib/api/tasks';
 export function TaskListView({
   query,
   projectId,
+  canCreateTask = true,
 }: {
   query: TaskQuery;
   projectId?: string;
+  canCreateTask?: boolean;
 }) {
   const { data: statuses, isLoading: statusesLoading } = useStatuses();
   const { data: tasks, isLoading: tasksLoading } = useTasks(query);
@@ -49,6 +51,7 @@ export function TaskListView({
           tasks={tasks}
           columns={columns}
           projectId={projectId}
+          canCreateTask={canCreateTask}
         />
       ))}
     </div>
