@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UsersService } from './users.service';
 import { UpdatePreferencesDto } from './dto/update-preferences.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -26,5 +27,13 @@ export class UsersController {
     @Body() dto: UpdatePreferencesDto,
   ) {
     return this.usersService.updatePreferences(u.userId, dto);
+  }
+
+  @Patch('me')
+  updateProfile(
+    @CurrentUser() u: { userId: string },
+    @Body() dto: UpdateProfileDto,
+  ) {
+    return this.usersService.updateProfile(u.userId, dto);
   }
 }
