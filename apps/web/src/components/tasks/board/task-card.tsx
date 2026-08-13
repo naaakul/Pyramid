@@ -16,9 +16,6 @@ export function TaskCard({ task }: { task: ApiTask }) {
   const { visible } = useBoardFieldsStore();
   const assignee = task.assignees[0]?.user;
 
-  console.log("visible ->", visible)
-  console.log("tasks ->", task)
-
   return (
     <Link href={`/tasks/${task.id}`} className="block">
       <Card className="p-3 pt-1.5 gap-2 shadow-none border-ink-border">
