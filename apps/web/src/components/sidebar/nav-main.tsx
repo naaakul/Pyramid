@@ -17,14 +17,14 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+      <SidebarGroupLabel className='text-ink-900'>Workspace</SidebarGroupLabel>
       <SidebarMenu>
         {NAV_ITEMS.map(({ href, label, icon: Icon, section }) => {
           const isActive = override ? override === section : pathname.startsWith(href);
           return (
             <SidebarMenuItem key={href}>
               <SidebarMenuButton asChild isActive={isActive}>
-                <Link href={href}><Icon /><span>{label}</span></Link>
+                <Link href={href} ><Icon /><span>{label}</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           );

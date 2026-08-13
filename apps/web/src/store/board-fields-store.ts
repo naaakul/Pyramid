@@ -6,7 +6,6 @@ export const FIELD_CONFIG = [
   { key: 'members', label: 'Members' },
   { key: 'dueDate', label: 'Due Date' },
   { key: 'labels', label: 'Labels' },
-  { key: 'status', label: 'Status' },
   { key: 'reporter', label: 'Reporter' },
 ] as const;
 

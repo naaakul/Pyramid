@@ -17,17 +17,17 @@ export function TaskRow({
   return (
     <Link href={`/tasks/${task.id}`} className="contents">
       <div
-        className="grid items-center gap-2 px-4 py-3 border-b last:border-b-0 text-sm hover:bg-ink-bg"
+        className="grid items-center gap-2 p-2.5 px-3.5 border-b text-sm hover:bg-ink-bg"
         style={{ gridTemplateColumns: gridTemplate }}
       >
-        <span className="truncate text-ink-text">{task.title}</span>
+        <span className="truncate text-ink-900">{task.title}</span>
         {columns.map((col) => (
           <div key={col.key}>
             {col.render(task)}
           </div>
         ))}
         <button
-          className="text-ink-sec hover:text-ink-text justify-self-end"
+          className="text-ink-sec hover:text-ink-900 justify-self-end"
           onClick={(e) => e.preventDefault()}
         >
           <MoreHorizontal size={16} />

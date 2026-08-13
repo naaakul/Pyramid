@@ -4,6 +4,7 @@ import { useTaskDetail } from "@/hooks/use-tasks";
 import { useTaskPanelStore } from "@/store/task-panel-store";
 import { useCurrentUser } from "@/lib/auth/current-user-context";
 import { TaskDetailHeader } from "./task-detail-header";
+import { TaskDetailActions } from "./task-detail-actions";
 import { TaskProperties } from "./task-properties";
 import { TaskLabels } from "./task-labels";
 import { SubtasksTable } from "./subtasks-table";
@@ -30,58 +31,70 @@ export function TaskDetailClient({
   const isSubtask = task.parentTaskId !== null;
   const isProjectTask = task.projectId !== null;
 
+  const actions = (
+    <TaskDetailActions
+      task={task}
+      isReporter={isReporter}
+      isSubtask={isSubtask}
+      isProjectTask={isProjectTask}
+    />
+  );
+
   return (
-    <div className="flex gap-6 p-6 max-w-6xl mx-auto">
-      {/* need to watch */}
+    <div className="max-w-6xl mx-auto p-6">
       <TaskBreadcrumb task={task} />
-      <div className="flex-1 min-w-0">
-        <TaskDetailHeader
-          task={task}
-          isReporter={isReporter}
-          isSubtask={isSubtask}
-          isProjectTask={isProjectTask}
-        />
-        {!isSubtask && (
-          <TaskProperties dueDateEnd={task.dueDateEnd} teams={task.teams} />
-        )}
-        {!isSubtask && (
-          <TaskLabels
-            labels={task.labels}
-            editable={isReporter}
+
+      <div className="flex gap-6 items-start">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <TaskDetailHeader task={task} isReporter={isReporter} />
+            {!panelOpen && actions}
+          </div>
+
+          {!isSubtask && (
+            <TaskProperties dueDateEnd={task.dueDateEnd} teams={task.teams} />
+          )}
+          {!isSubtask && (
+            <TaskLabels
+              labels={task.labels}
+              editable={isReporter}
+              taskId={task.id}
+            />
+          )}
+          {!isSubtask && (
+            <TaskResources
+              taskId={task.id}
+              attachments={task.attachments}
+              editable={isReporter}
+            />
+          )}
+          {!isSubtask && !isProjectTask && (
+            <SubtasksTable
+              parentId={task.id}
+              subtasks={task.subtasks}
+              isReporter={isReporter}
+            />
+          )}
+          <CommentsSection
             taskId={task.id}
-          />
-        )}
-        {!isSubtask && (
-          <TaskResources
-            taskId={task.id}
-            attachments={task.attachments}
-            editable={isReporter}
-          />
-        )}
-        {!isSubtask && !isProjectTask && (
-          <SubtasksTable
-            parentId={task.id}
-            subtasks={task.subtasks}
             isReporter={isReporter}
+            isLocked={task.isLocked}
           />
-        )}
-        <CommentsSection
-          taskId={task.id}
-          isReporter={isReporter}
-          isLocked={task.isLocked}
-        />
-      </div>
-      {panelOpen && (
-        <div className="w-72 shrink-0">
-          <DetailsPanel
-            task={task}
-            isReporter={isReporter}
-            isSubtask={isSubtask}
-            isProjectTask={isProjectTask}
-          />
-          {!isSubtask && <UpdatesPanel activities={task.activities} />}
         </div>
-      )}
+
+        {panelOpen && (
+          <div className="w-72 shrink-0 sticky top-6">
+            <div className="flex justify-end gap-2 mb-4">{actions}</div>
+            <DetailsPanel
+              task={task}
+              isReporter={isReporter}
+              isSubtask={isSubtask}
+              isProjectTask={isProjectTask}
+            />
+            {!isSubtask && <UpdatesPanel activities={task.activities} />}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

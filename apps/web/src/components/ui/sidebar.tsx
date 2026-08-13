@@ -466,13 +466,13 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button group/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-ink-100 hover:text-ink-text focus-visible:ring-2 active:bg-ink-100 active:text-ink-text disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-ink-100 data-open:hover:text-ink-text data-active:bg-ink-100 data-active:font-medium data-active:text-ink-text [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
+  "peer/menu-button group/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,height,padding] group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! hover:bg-ink-100 hover:text-ink-900 focus-visible:ring-2 active:bg-ink-100 active:text-ink-900 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-ink-100 data-open:hover:text-ink-900 data-active:bg-ink-100 data-active:font-medium data-active:text-ink-900 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate",
   {
     variants: {
       variant: {
-        default: "hover:bg-ink-100 hover:text-ink-text",
+        default: "hover:bg-ink-100 hover:text-ink-900",
         outline:
-          "bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-ink-100 hover:text-ink-text hover:shadow-[0_0_0_1px_var(--ink-100)]",
+          "bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-ink-100 hover:text-ink-900 hover:shadow-[0_0_0_1px_var(--ink-100)]",
       },
       size: {
         default: "h-8 text-sm",

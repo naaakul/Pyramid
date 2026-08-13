@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
+import { Plus, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from './search-bar';
 import { FieldsPopover } from './fields-popover';
@@ -33,15 +33,15 @@ export function TasksToolbar({ initialView, projectId }: { initialView: 'list' |
   return (
     <div>
       <div className="flex items-center justify-between px-6 pt-6 pb-4">
-        <h1 className="text-lg font-semibold">Tasks</h1>
+        <h1 className="text-lg font-semibold text-ink-900">Tasks</h1>
         <div className="flex items-center gap-2">
           <SearchBar value={search} onChange={setSearch} />
           <FieldsPopover />
-          <NotificationBell type="task" />
           <FilterMenu />
+          <NotificationBell type="task" />
           {canCreateTask && (
-            <Button size="sm" className="bg-ink-900 text-white hover:bg-ink-700" onClick={() => openTask({ projectId })}>
-              + Add Task
+            <Button size="default" className="bg-ink-900 text-white hover:bg-ink-700" onClick={() => openTask({ projectId })}>
+              <Plus/> Add Task
             </Button>
           )}
         </div>

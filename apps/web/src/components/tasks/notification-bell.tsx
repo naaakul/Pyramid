@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Check } from "lucide-react";
+import { Bell, Check, Icon } from "lucide-react";
 import { toast } from "sonner";
 import {
   Popover,
@@ -22,14 +22,14 @@ export function NotificationBell({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="relative w-9 h-9 border rounded-md flex items-center justify-center text-ink-600 hover:bg-ink-50">
+        <Button variant="outline" size="icon" className="border-ink-border text-ink-900 hover:bg-ink-bg hover:text-none">
           <Bell size={16} />
           {count > 0 && (
             <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">
               {count}
             </span>
           )}
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 p-2">
         <div className="text-sm font-medium px-1 mb-1">

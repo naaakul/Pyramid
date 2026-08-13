@@ -27,8 +27,11 @@ export function FieldsPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="py-1 gap-0 border-ink-border text-ink-text hover:bg-ink-bg hover:text-none">
-          <Columns3 size={16} className="mr-1" /> 
+        <Button
+          variant="outline"
+          className="py-1 gap-0 border-ink-border text-ink-900 hover:bg-ink-bg hover:text-none"
+        >
+          <Columns3 size={16} className="mr-1" />
           <p className="mb-0.5">Fields</p>
         </Button>
       </PopoverTrigger>
@@ -57,7 +60,11 @@ export function FieldsPopover() {
         </div>
 
         <div className="flex flex-col">
-          {FIELD_CONFIG.map((field) => (
+          {FIELD_CONFIG.filter(
+            (field) =>
+              view !== "board" ||
+              !["status", "reporter", "priority"].includes(field.key),
+          ).map((field) => (
             <label
               key={field.key}
               className="flex items-center justify-between px-2 py-1.5 text-sm hover:bg-gray-50 rounded cursor-pointer"

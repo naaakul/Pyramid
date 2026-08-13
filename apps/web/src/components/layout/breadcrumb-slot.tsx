@@ -32,11 +32,11 @@ export function BreadcrumbSlot() {
           <span key={i} className="flex items-center gap-1.5 ">
             <BreadcrumbItem>
               {crumb.href ? (
-                <BreadcrumbLink href={crumb.href} className='text-ink-sec hover:text-ink-text mb-0.5'>
+                <BreadcrumbLink href={crumb.href} className='text-ink-sec hover:text-ink-900 mb-0.5'>
                   {crumb.label}
                 </BreadcrumbLink>
               ) : (
-                <BreadcrumbPage className='text-ink-text mb-0.5'>{crumb.label}</BreadcrumbPage>
+                <BreadcrumbPage className='text-ink-900 mb-0.5'>{crumb.label}</BreadcrumbPage>
               )}
             </BreadcrumbItem>
 

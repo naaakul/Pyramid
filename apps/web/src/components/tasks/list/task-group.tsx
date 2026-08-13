@@ -28,7 +28,7 @@ export function TaskGroup({
     <div className="mb-6">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 text-sm font-medium text-ink-text mb-2"
+        className="flex items-center gap-1.5 text-sm font-medium text-ink-900 mb-2"
       >
         <ChevronDown
           size={16}
@@ -40,7 +40,7 @@ export function TaskGroup({
       {open && (
         <div className="border rounded-lg overflow-hidden border-ink-border">
           <div
-            className="grid gap-2 px-4 py-2 bg-ink-bg text-xs font-medium text-ink-text border-b border-ink-border"
+            className="grid gap-2 p-3.5 bg-ink-bg text-xs text-ink-900 font-medium border-b border-ink-border"
             style={{ gridTemplateColumns: gridTemplate }}
           >
             <span>Task</span>
@@ -64,7 +64,7 @@ export function TaskGroup({
           {canCreateTask && (
             <button
               onClick={() => openTask({ statusId: status.id, projectId })}
-              className="flex items-center gap-1.5 text-sm text-ink-sec hover:text-ink-500 px-4 py-2.5 w-full text-left"
+              className="flex items-center gap-1.5 text-sm text-ink-900 hover:text-ink-500 p-3 w-full text-left"
             >
               <Plus size={14} />
               Add Task

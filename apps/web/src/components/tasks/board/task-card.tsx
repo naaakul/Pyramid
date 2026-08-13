@@ -16,12 +16,15 @@ export function TaskCard({ task }: { task: ApiTask }) {
   const { visible } = useBoardFieldsStore();
   const assignee = task.assignees[0]?.user;
 
+  console.log("visible ->", visible)
+  console.log("tasks ->", task)
+
   return (
     <Link href={`/tasks/${task.id}`} className="block">
       <Card className="p-3 pt-1.5 gap-2 shadow-none border-ink-border">
         <div className="flex items-start justify-between ">
-          <p className="text-sm font-medium text-ink-text">{task.title}</p>
-          <MoreHorizontal size={16} className="text-ink-sec shrink-0" />
+          <p className="text-sm font-medium text-ink-900">{task.title}</p>
+          <MoreHorizontal size={16} className="text-ink-900 shrink-0" />
         </div>
 
         {(isMembersVisible(visible) || visible.dueDate) && (
@@ -33,13 +36,13 @@ export function TaskCard({ task }: { task: ApiTask }) {
                     {assignee.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-xs text-ink-sec">{assignee.name}</span>
+                <span className="text-xs text-ink-900">{assignee.name}</span>
               </div>
             )}
             {visible.dueDate && task.dueDateEnd && (
               <Badge
                 variant="outline"
-                className="gap-1 text-red-500 border-0 bg-red-500/10 text-[11px] px-1.5 py-0"
+                className="gap-1 text-red-500 border-0 bg-red-500/10 text-[11px] px-1.5 py-0 ml-auto"
               >
                 <Calendar size={11} />
                 {new Date(task.dueDateEnd).toLocaleDateString("en-US", {
@@ -53,19 +56,16 @@ export function TaskCard({ task }: { task: ApiTask }) {
 
         {/* {visible.priority && <PriorityBadge priority={task.priority} />} */}
 
-
         {visible.labels && task.labels.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-        {task.labels.map(({ label }) => (
-          <Badge key={label.id} variant="secondary">
-          <Tag size={10} />
-          <p className="mb-0.5">
-          {label.name}
-          </p>
-            </Badge>
-          ))}
-        </div>
-      )}
+          <div className="flex flex-wrap gap-1">
+            {task.labels.map(({ label }) => (
+              <Badge key={label.id} variant="secondary">
+                <Tag size={10} />
+                <p className="mb-0.5">{label.name}</p>
+              </Badge>
+            ))}
+          </div>
+        )}
       </Card>
     </Link>
   );
