@@ -14,6 +14,7 @@ export interface ApiUser {
   id: string;
   name: string;
   avatarColor: string | null;
+  imageUrl: string | null;
 }
 
 export interface ApiStatus {

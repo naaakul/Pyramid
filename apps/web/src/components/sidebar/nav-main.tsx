@@ -18,7 +18,7 @@ export function NavMain() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel className='text-ink-900'>Workspace</SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarMenu className='gap-1'>
         {NAV_ITEMS.map(({ href, label, icon: Icon, section }) => {
           const isActive = override ? override === section : pathname.startsWith(href);
           return (

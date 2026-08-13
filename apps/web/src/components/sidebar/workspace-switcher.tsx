@@ -67,12 +67,17 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
                   </AvatarFallback>
                 )}
               </Avatar>
-              <span className="font-semibold text-nowrap text-ink-900">{user.name}</span>
+              <span className="font-semibold text-nowrap text-ink-900">
+                {user.name}
+              </span>
               <ChevronsUpDown className="ml-auto h-4 w-4 text-ink-900" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-60 border-ink-border text-ink-900 bg-ink-bg shadow-ink-100">
-            <div className="flex flex-col items-center py-3 border-b mb-1">
+          <DropdownMenuContent
+            align="start"
+            className="w-60 border-ink-border text-ink-900 bg-ink-bg shadow-ink-100"
+          >
+            <div className="flex flex-col items-center py-3 mb-1">
               <Avatar className="h-10 w-10 rounded-full mb-2 overflow-hidden">
                 {user.avatarUrl ? (
                   <Image src={user.avatarUrl} alt="" height={100} width={100} />
@@ -90,67 +95,77 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
                 <span className="text-xs text-ink-500">{user.email}</span>
               )}
             </div>
-
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Sun size={14} className="mr-2" /> Change Theme
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="border-ink-border text-ink-900 ">
-                <DropdownMenuItem
-                  onClick={() => setThemeMode("LIGHT")}
-                  className="flex items-center justify-between"
-                >
-                  Light {themeMode === "LIGHT" && <Check size={14} />}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setThemeMode("DARK")}
-                  className="flex items-center justify-between"
-                >
-                  Dark {themeMode === "DARK" && <Check size={14} />}
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <span
-                  className="w-3.5 h-3.5 rounded-sm mr-2"
-                  style={{
-                    backgroundColor:
-                      dynamicOption.swatch === "#fafafa"
-                        ? "#fafafa"
-                        : COLOR_OPTIONS.find((o) => o.value === colorMode)
-                            ?.swatch,
-                  }}
-                />
-                Color Mode
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="border-ink-border text-ink-900">
-                {displayOptions.map((opt) => (
+            <DropdownMenuSeparator />
+            <div className="flex flex-col gap-1">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Sun size={14} className="mr-2" /> Change Theme
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="border-ink-border text-ink-900 ">
                   <DropdownMenuItem
-                    key={opt.value}
-                    onClick={() => setColorMode(opt.value)}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setThemeMode("LIGHT");
+                    }}
                     className="flex items-center justify-between"
                   >
-                    <span className="flex items-center gap-2">
-                      <span
-                        className="w-3.5 h-3.5 rounded-sm border"
-                        style={{ backgroundColor: opt.swatch }}
-                      />
-                      {opt.label}
-                    </span>
-                    {colorMode === opt.value && <Check size={14} />}
+                    Light {themeMode === "LIGHT" && <Check size={14} />}
                   </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setThemeMode("DARK");
+                    }}
+                    className="flex items-center justify-between"
+                  >
+                    Dark {themeMode === "DARK" && <Check size={14} />}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
 
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/settings/profile" className="flex items-center">
-                <Settings size={14} className="mr-2" /> Settings
-              </Link>
-            </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <span
+                    className="w-3.5 h-3.5 rounded mr-2"
+                    style={{
+                      backgroundColor:
+                        dynamicOption.swatch === "#fafafa"
+                          ? "#fafafa"
+                          : COLOR_OPTIONS.find((o) => o.value === colorMode)
+                              ?.swatch,
+                    }}
+                  />
+                  Color Mode
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="border-ink-border text-ink-900">
+                  {displayOptions.map((opt) => (
+                    <DropdownMenuItem
+                      key={opt.value}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setColorMode(opt.value);
+                      }}
+                      className="flex items-center justify-between"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="w-3.5 h-3.5 rounded border"
+                          style={{ backgroundColor: opt.swatch }}
+                        />
+                        {opt.label}
+                      </span>
+                      {colorMode === opt.value && <Check size={14} />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuItem asChild>
+                <Link href="/settings/profile" className="flex items-center">
+                  <Settings size={14} className="mr-2" /> Settings
+                </Link>
+              </DropdownMenuItem>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

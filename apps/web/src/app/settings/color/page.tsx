@@ -28,7 +28,7 @@ export default function ColorSettingsPage() {
             className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-ink-50"
           >
             <span className="flex items-center gap-2">
-              <span className="w-3.5 h-3.5 rounded-sm border" style={{ backgroundColor: c.swatch }} />
+              <span className="w-3.5 h-3.5 border rounded" style={{ backgroundColor: c.swatch }} />
               {c.label}
             </span>
             {colorMode === c.value && <Check size={16} />}

@@ -12,14 +12,14 @@ export function CollapsibleSection({ title, defaultOpen = true, children, action
   const [open, setOpen] = useState(defaultOpen);
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between">
         <CollapsibleTrigger className="flex items-center gap-1.5 text-sm font-medium">
           <ChevronDown size={14} className={`transition-transform ${open ? '' : '-rotate-90'}`} />
           {title}
         </CollapsibleTrigger>
         {actions}
       </div>
-      <CollapsibleContent>{children}</CollapsibleContent>
+      <CollapsibleContent className='mt-2'>{children}</CollapsibleContent>
     </Collapsible>
   );
 }

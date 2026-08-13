@@ -11,26 +11,23 @@ import { useUpdateTask } from "@/hooks/use-tasks";
 import type { ApiTaskDetail } from "@/lib/api/tasks";
 import { TeamSelect } from "./team-select";
 
-export function DetailsPanel({ task, isReporter, isSubtask, isProjectTask }: {
-  task: ApiTaskDetail; isReporter: boolean; isSubtask: boolean; isProjectTask: boolean;
+export function DetailsPanel({
+  task,
+  isReporter,
+  isSubtask,
+  isProjectTask,
+}: {
+  task: ApiTaskDetail;
+  isReporter: boolean;
+  isSubtask: boolean;
+  isProjectTask: boolean;
 }) {
   const updateTask = useUpdateTask(task.id);
 
   return (
     <div className="border rounded-lg p-3 mb-4">
-      <CollapsibleSection title="Details"
-        actions={
-          isReporter && (
-            <div className="flex items-center gap-1 text-ink-400">
-              <button className="hover:text-ink-600">
-                <Plus size={14} />
-              </button>
-              <button className="hover:text-ink-600">
-                <Settings size={14} />
-              </button>
-            </div>
-          )
-        }
+      <CollapsibleSection
+        title="Details"
       >
         <div className="space-y-2.5 text-sm">
           <div className="flex items-center justify-between">
@@ -64,7 +61,14 @@ export function DetailsPanel({ task, isReporter, isSubtask, isProjectTask }: {
           {!isProjectTask && (
             <div className="flex items-center justify-between">
               <span className="text-ink-500">Members</span>
-              {isReporter ? <AddMembersModal taskId={task.id} assignees={task.assignees} /> : <span className="text-ink-700">{task.assignees.length} member{task.assignees.length !== 1 && 's'}</span>}
+              {isReporter ? (
+                <AddMembersModal taskId={task.id} assignees={task.assignees} />
+              ) : (
+                <span className="text-ink-700">
+                  {task.assignees.length} member
+                  {task.assignees.length !== 1 && "s"}
+                </span>
+              )}
             </div>
           )}
 

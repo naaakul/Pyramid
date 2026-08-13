@@ -55,14 +55,14 @@ export function TaskResources({ taskId, attachments, editable }: { taskId: strin
         <span className="text-sm text-ink-500 w-24 shrink-0">Resources</span>
         <div className="flex flex-wrap gap-1.5 items-center">
           {attachments.map((a) => (
-            <span key={a.id} className="flex items-center gap-1.5 text-xs bg-ink-100 rounded-full pl-2.5 pr-1 py-1">
+            <span key={a.id} className="flex items-center gap-1.5 text-xs bg-ink-100 rounded-full pl-2.5 p-2 py-1">
               {a.type === 'link' ? (
-                <a href={a.url} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">
-                  <LinkIcon size={11} /> {a.name}
+                <a href={a.url} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1 font-medium">
+                  <LinkIcon strokeWidth={2.5} size={11} /> {a.name}
                 </a>
               ) : (
-                <a href={a.url} download className="hover:underline flex items-center gap-1">
-                  <Paperclip size={11} /> {a.name.length > 16 ? `${a.name.slice(0, 14)}…` : a.name} · {fileExt(a.name)}
+                <a href={a.url} download className="hover:underline flex items-center gap-1 font-medium">
+                  <Paperclip strokeWidth={2.5} size={11} /> {a.name.length > 16 ? `${a.name.slice(0, 14)}…` : a.name} · {fileExt(a.name)}
                 </a>
               )}
               {editable && (
