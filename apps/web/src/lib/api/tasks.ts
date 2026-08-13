@@ -90,6 +90,7 @@ export interface ApiTaskDetail extends ApiTask {
   activities: ApiActivity[];
   watcherCount: number;
   parentTask: { id: string; title: string } | null;
+  project: { id: string; name: string } | null;
 
   invites: {
     invitedUser: {

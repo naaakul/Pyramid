@@ -15,6 +15,7 @@ import { useTaskComposerStore } from '@/store/task-composer-store';
 import { useProject } from '@/hooks/use-projects';
 import { useCurrentUser } from '@/lib/auth/current-user-context';
 import type { TaskQuery } from '@/lib/api/tasks';
+import { useSetActiveSection } from '@/hooks/use-set-active-section';
 
 export function TasksToolbar({ initialView, projectId }: { initialView: 'list' | 'board'; projectId?: string }) {
   const [search, setSearch] = useState('');
@@ -23,8 +24,8 @@ export function TasksToolbar({ initialView, projectId }: { initialView: 'list' |
   const openTask = useTaskComposerStore((s) => s.openTask);
   const currentUser = useCurrentUser();
   const { data: project } = useProject(projectId ?? '');
+  useSetActiveSection('tasks');
 
-  // Outside a project: anyone can create. Inside a project: lead only.
   const canCreateTask = !projectId || project?.leadId === currentUser.id;
 
   const query: TaskQuery = { search: debouncedSearch, ...filters, ...(projectId && { projectId }) };
