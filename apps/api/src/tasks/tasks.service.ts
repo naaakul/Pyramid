@@ -32,7 +32,17 @@ export class TasksService {
       where: {
         parentTaskId: null,
         AND: [
-          { OR: [{ workspaceId }, { assignees: { some: { userId } } }] },
+          {
+            OR: [
+              { workspaceId },
+              { assignees: { some: { userId } } },
+              { project: { members: { some: { userId } } } },
+              { project: { leadId: userId } },
+            ],
+          },
+          query.projectId
+            ? { projectId: query.projectId }
+            : { projectId: null },
           ...(query.search
             ? [
                 {
@@ -45,7 +55,6 @@ export class TasksService {
             : []),
           ...(query.statusId ? [{ statusId: query.statusId }] : []),
           ...(query.priority ? [{ priority: query.priority }] : []),
-          ...(query.projectId ? [{ projectId: query.projectId }] : []),
           ...(query.assigneeId
             ? [{ assignees: { some: { userId: query.assigneeId } } } as const]
             : []),
@@ -72,6 +81,8 @@ export class TasksService {
           { workspaceId },
           { assignees: { some: { userId: requesterId } } },
           { reporterId: requesterId },
+          { project: { members: { some: { userId: requesterId } } } },
+          { project: { leadId: requesterId } },
         ],
       },
       include: {

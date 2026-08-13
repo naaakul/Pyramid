@@ -78,6 +78,10 @@ model WorkspaceInvite {
   invitedBy   User      @relation("InvitesSent", fields: [invitedById], references: [id], onDelete: Cascade)
   task        Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@unique([workspaceId, invitedUserId, taskId, projectId])
   @@unique([workspaceId, invitedUserId, taskId])
 }
 
@@ -112,6 +116,8 @@ model User {
 
   commentReactions CommentReaction[]
   taskWatches      TaskWatcher[]
+
+  projectMemberships ProjectMember[]
 }
 
 model Workspace {
@@ -193,6 +199,9 @@ model Project {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   lead      User?     @relation("ProjectLead", fields: [leadId], references: [id])
   tasks     Task[]
+
+  members ProjectMember[]
+  invites WorkspaceInvite[]
 
   @@index([workspaceId])
 }
@@ -343,4 +352,13 @@ model TaskWatcher {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([taskId, userId])
+}
+
+model ProjectMember {
+  id        String  @id @default(cuid())
+  projectId String
+  userId    String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([projectId, userId])
 }

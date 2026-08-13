@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateInviteDto } from './dto/create-invite.dto';
 
@@ -7,21 +7,31 @@ export class InvitesService {
   constructor(private prisma: PrismaService) {}
 
   async create(workspaceId: string, invitedById: string, dto: CreateInviteDto) {
+    if (!dto.taskId && !dto.projectId) throw new BadRequestException('taskId or projectId is required');
+
     const existing = await this.prisma.workspaceInvite.findFirst({
-      where: { workspaceId, invitedUserId: dto.invitedUserId, taskId: dto.taskId ?? null, status: 'PENDING' },
+      where: {
+        workspaceId, invitedUserId: dto.invitedUserId,
+        taskId: dto.taskId ?? null, projectId: dto.projectId ?? null, status: 'PENDING',
+      },
     });
-    if (existing) throw new ConflictException('Invite already pending for this user');
+    if (existing) throw new ConflictException('Invite already pending');
 
     return this.prisma.workspaceInvite.create({
-      data: { workspaceId, invitedUserId: dto.invitedUserId, invitedById, taskId: dto.taskId },
-      include: { invitedBy: true, task: true },
+      data: { workspaceId, invitedUserId: dto.invitedUserId, invitedById, taskId: dto.taskId, projectId: dto.projectId },
+      include: { invitedBy: true, task: true, project: true },
     });
   }
 
-  findPendingForUser(userId: string) {
+  findPendingForUser(userId: string, type?: 'task' | 'project') {
     return this.prisma.workspaceInvite.findMany({
-      where: { invitedUserId: userId, status: 'PENDING' },
-      include: { invitedBy: true, task: true, workspace: true },
+      where: {
+        invitedUserId: userId,
+        status: 'PENDING',
+        ...(type === 'task' && { taskId: { not: null } }),
+        ...(type === 'project' && { projectId: { not: null } }),
+      },
+      include: { invitedBy: true, task: true, project: true },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -33,16 +43,16 @@ export class InvitesService {
 
     await this.prisma.$transaction([
       this.prisma.workspaceInvite.update({ where: { id: inviteId }, data: { status: 'ACCEPTED', respondedAt: new Date() } }),
-      this.prisma.workspaceMember.upsert({
-        where: { workspaceId_userId: { workspaceId: invite.workspaceId, userId } },
-        create: { workspaceId: invite.workspaceId, userId, role: 'MEMBER' },
-        update: {},
-      }),
       ...(invite.taskId
         ? [this.prisma.taskAssignee.upsert({
             where: { taskId_userId: { taskId: invite.taskId, userId } },
-            create: { taskId: invite.taskId, userId },
-            update: {},
+            create: { taskId: invite.taskId, userId }, update: {},
+          })]
+        : []),
+      ...(invite.projectId
+        ? [this.prisma.projectMember.upsert({
+            where: { projectId_userId: { projectId: invite.projectId, userId } },
+            create: { projectId: invite.projectId, userId }, update: {},
           })]
         : []),
     ]);

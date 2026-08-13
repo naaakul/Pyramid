@@ -11,12 +11,13 @@ export class UsersController {
 
   @Get('search')
   search(
-    @CurrentUser() u: { userId: string; workspaceId: string },
+    @CurrentUser() u: { userId: string },
     @Query('email') email: string,
     @Query('taskId') taskId?: string,
+    @Query('projectId') projectId?: string,
   ) {
     if (!email || email.length < 3) return [];
-    return this.usersService.searchByEmail(u.userId, email, taskId);
+    return this.usersService.searchByEmail(u.userId, email, taskId, projectId);
   }
 
   @Patch('me/preferences')
