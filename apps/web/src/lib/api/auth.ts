@@ -3,8 +3,10 @@ export interface CurrentUser {
   name: string;
   email: string | null;
   avatarColor: string | null;
-  isGuest: boolean;
   avatarUrl: string | null;
+  title: string | null;
+  username: string | null;
+  isGuest: boolean;
   workspaceId: string;
   themeMode: 'LIGHT' | 'DARK';
   colorMode: 'AMBER' | 'BLUE' | 'PINK' | 'ROSE' | 'EMERALD' | 'BLACK';

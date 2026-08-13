@@ -8,9 +8,9 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { BreadcrumbSlot } from "@/components/layout/breadcrumb-slot";
-import { CurrentUserProvider } from "@/lib/auth/current-user-context";
 import { TaskComposerModal } from "@/components/tasks/task-composer-modal";
 import { ProjectCreateModal } from "@/components/projects/project-create-modal";
+import  AuthenticatedLayout  from "@/components/auth/authenticated-layout";
 
 export default async function AppLayout({
   children,
@@ -22,7 +22,7 @@ export default async function AppLayout({
   if (!user) redirect("/login");
 
   return (
-    <CurrentUserProvider user={user}>
+    <AuthenticatedLayout>
       <SidebarProvider>
         <AppSidebar user={user} />
         <SidebarInset>
@@ -35,6 +35,6 @@ export default async function AppLayout({
           <ProjectCreateModal />
         </SidebarInset>
       </SidebarProvider>
-    </CurrentUserProvider>
+    </AuthenticatedLayout>
   );
 }

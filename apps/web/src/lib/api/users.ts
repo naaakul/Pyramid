@@ -16,3 +16,7 @@ export const searchUsersByEmail = (
   apiFetch<SearchedUser[]>(
     `/users/search?email=${encodeURIComponent(email)}${taskId ? `&taskId=${taskId}` : ""}${projectId ? `&projectId=${projectId}` : ""}`,
   );
+
+export const updateProfile = (
+  data: Partial<{ name: string; title: string; username: string }>,
+) => apiFetch(`/users/me`, { method: "PATCH", body: JSON.stringify(data) });
