@@ -9,7 +9,7 @@ export class LabelsService {
   findAll(workspaceId: string) {
     return this.prisma.label.findMany({
       where: { workspaceId },
-      orderBy: { name: 'asc' },
+      // orderBy: { name: 'asc' },
     });
   }
 

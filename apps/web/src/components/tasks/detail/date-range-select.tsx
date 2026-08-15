@@ -23,8 +23,8 @@ export function DateRangeSelect({
   return (
     <div className="flex items-center gap-1.5">
       <Popover open={editing === 'start'} onOpenChange={(o) => setEditing(o ? 'start' : null)}>
-        <PopoverTrigger asChild>
-          <button className="flex items-center gap-1 text-xs border rounded px-2 py-1 text-gray-600 hover:bg-gray-50">
+        <PopoverTrigger asChild className='border-ink-border'>
+          <button className="flex items-center gap-1 text-xs border rounded px-2 py-1 text-ink-500 hover:bg-gray-50">
             <CalendarIcon size={12} /> {fmt(start) ?? 'Start'}
           </button>
         </PopoverTrigger>
@@ -39,10 +39,10 @@ export function DateRangeSelect({
           />
         </PopoverContent>
       </Popover>
-      <span className="text-gray-300">→</span>
+      <span className="text-ink-500">→</span>
       <Popover open={editing === 'end'} onOpenChange={(o) => setEditing(o ? 'end' : null)}>
-        <PopoverTrigger asChild>
-          <button className="flex items-center gap-1 text-xs border rounded px-2 py-1 text-gray-600 hover:bg-gray-50">
+        <PopoverTrigger asChild className='border-ink-border'>
+          <button className="flex items-center gap-1 text-xs border rounded px-2 py-1 text-ink-500 hover:bg-gray-50">
             <CalendarIcon size={12} /> {fmt(end) ?? 'End'}
           </button>
         </PopoverTrigger>

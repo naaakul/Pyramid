@@ -19,16 +19,16 @@ export default function ColorSettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-8">
-      <h1 className="text-xl font-semibold mb-6">Color</h1>
-      <div className="border rounded-lg divide-y">
+      <h1 className="text-xl font-semibold mb-6 text-ink-900">Color</h1>
+      <div className="border rounded-lg divide-y divide-ink-border border-ink-border">
         {displayColors.map((c) => (
           <button
             key={c.value}
             onClick={() => setColorMode(c.value)}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-ink-50"
+            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-ink-bg text-ink-text"
           >
             <span className="flex items-center gap-2">
-              <span className="w-3.5 h-3.5 border rounded" style={{ backgroundColor: c.swatch }} />
+              <span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: c.swatch }} />
               {c.label}
             </span>
             {colorMode === c.value && <Check size={16} />}

@@ -59,7 +59,7 @@ export function SubtasksTable({
       {open && (
         <div className="border rounded-lg overflow-hidden border-ink-border">
           <div
-            className={`${GRID} p-3.5 bg-ink-bg text-xs font-medium text-ink-900 border-b`}
+            className={`${GRID} p-3.5 bg-ink-bg text-xs font-medium text-ink-900 border-b border-ink-border`}
           >
             <span>Task</span>
             <span>Priority</span>
@@ -76,7 +76,7 @@ export function SubtasksTable({
             <Link href={`/tasks/${task.id}`} className="truncate">
               <div
                 key={task.id}
-                className={`${GRID} p-2.5 px-3.5 border-b text-sm items-center hover:bg-ink-bg`}
+                className={`${GRID} p-2.5 px-3.5 border-b text-sm items-center border-ink-border hover:bg-ink-bg text-ink-text`}
               >
                 {isReporter ||
                 task.assignees.some((a) => a.user.id === currentUser.id) ? (
@@ -99,9 +99,9 @@ export function SubtasksTable({
                       <MoreHorizontal size={16} />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="ring-ink-border">
                       <DropdownMenuItem
-                        className="text-red-600"
+                        className="text-red-600 hover:bg-ink-bg hover:text-none"
                         onClick={() => removeTask.mutate(task.id)}
                       >
                         Delete

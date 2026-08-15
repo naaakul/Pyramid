@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { ApiActivity } from "@/lib/api/tasks";
 import { CollapsibleSection } from "@/components/shared/collapsible-section";
+import { useCurrentUser } from '@/lib/auth/current-user-context';
 
 const ACTIVITY_LABEL: Record<string, (a: ApiActivity) => string> = {
   TITLE_CHANGED: (a) => `renamed the task to "${a.toValue}"`,
@@ -25,13 +26,15 @@ const ACTIVITY_LABEL: Record<string, (a: ApiActivity) => string> = {
 };
 
 export function UpdatesPanel({ activities }: { activities: ApiActivity[] }) {
+  const currentUser = useCurrentUser();
+
   return (
-    <div className="border rounded-lg p-3">
+    <div className="border rounded-lg p-3 border-ink-border">
       <CollapsibleSection title="Updates">
         <div className="h-96 overflow-y-auto pr-1">
           <div className="space-y-3">
             {activities.length === 0 && (
-              <p className="text-xs text-gray-400">No activity yet.</p>
+              <p className="text-xs text-ink-500">No activity yet.</p>
             )}
 
             {activities.map((a) => (
@@ -48,13 +51,13 @@ export function UpdatesPanel({ activities }: { activities: ApiActivity[] }) {
                 </Avatar>
 
                 <div>
-                  <span className="font-medium text-gray-800">
-                    {a.actor.name}
+                  <span className="font-medium text-ink-900">
+                    {a.actor.id === currentUser.id ? 'You' : a.actor.name}
                   </span>{" "}
-                  <span className="text-gray-500">
+                  <span className="text-ink-500">
                     {(ACTIVITY_LABEL[a.type] ?? (() => a.type))(a)}
                   </span>
-                  <div className="text-gray-400 mt-0.5">
+                  <div className="text-ink-sec mt-0.5">
                     {new Date(a.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       year: "numeric",

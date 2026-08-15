@@ -63,10 +63,10 @@ export function TaskDetailActions({
       {showViewShare && isReporter && <ShareButton taskId={task.id} />}
       {isReporter && (
         <DropdownMenu>
-          <DropdownMenuTrigger className="w-8 h-8 border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50">
+          <DropdownMenuTrigger className="w-8 h-8 border border-ink-border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50">
             <MoreHorizontal size={14} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="ring-ink-border">
             <DropdownMenuItem
               className="text-red-600 flex items-center gap-2"
               onClick={() => setConfirmOpen(true)}

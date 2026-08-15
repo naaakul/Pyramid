@@ -20,9 +20,9 @@ export function ProjectTable({ search }: { search?: string }) {
 
   return (
     <div className="px-6">
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border border-ink-border rounded-lg overflow-hidden">
         <div
-          className={`${PROJECT_GRID} p-3.5 bg-ink-bg text-xs text-ink-900 font-medium border-b`}
+          className={`${PROJECT_GRID} p-3.5 bg-ink-bg text-xs text-ink-900 font-medium border-b border-ink-border`}
         >
           <span>Projects</span>
           <span>Priority</span>

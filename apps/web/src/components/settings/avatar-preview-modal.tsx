@@ -10,7 +10,7 @@ export function AvatarPreviewModal({
 }: { open: boolean; onOpenChange: (o: boolean) => void; avatarUrl: string | null; name: string }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xs flex flex-col items-center gap-4 [&>button]:hidden">
+      <DialogContent className="max-w-xs flex flex-col items-center gap-4 bg-transparent ring-transparent [&>button]:hidden">
         <button onClick={() => onOpenChange(false)} className="self-end text-ink-400 hover:text-ink-600">
           <X size={18} />
         </button>

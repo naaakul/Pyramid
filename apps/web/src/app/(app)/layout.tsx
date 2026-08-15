@@ -27,7 +27,7 @@ export default async function AppLayout({
         <AppSidebar user={user} />
         <SidebarInset>
           <header className="flex h-12 items-center gap-2 px-4 border-b border-ink-border pl-2">
-            <SidebarTrigger className="text-ink-text hover:text-ink-700 hover:bg-ink-bg" />
+            <SidebarTrigger className="text-ink-900 hover:text-ink-700 hover:bg-ink-bg" />
             <BreadcrumbSlot />
           </header>
           <div className="flex-1">{children}</div>

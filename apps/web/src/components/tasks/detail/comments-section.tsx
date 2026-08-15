@@ -83,7 +83,7 @@ function Composer({
   }
 
   return (
-    <div className="border rounded-lg px-3 py-2">
+    <div className="border rounded-lg px-3 py-2 border-ink-border">
       {imageUrl && (
         <div className="relative w-16 h-16 mb-2">
           <img
@@ -105,7 +105,7 @@ function Composer({
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder={placeholder}
-          className="flex-1 text-sm outline-none placeholder:text-ink-400"
+          className="flex-1 text-sm outline-none placeholder:text-ink-400 text-ink-900"
         />
         <button
           onClick={() => fileRef.current?.click()}
@@ -166,7 +166,7 @@ function CommentBubble({
               {comment.author.name.charAt(0)}
             </AvatarFallback>
           </Avatar>
-          <UserLabel user={comment.author} showAvatar={false} />
+          <UserLabel user={comment.author} showAvatar={false}/>
           <span className="text-xs text-ink-400">
             {timeAgo(comment.createdAt)}
           </span>
@@ -197,7 +197,7 @@ function CommentBubble({
               <DropdownMenuTrigger className="hover:text-ink-600">
                 <MoreHorizontal size={14} />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="ring-ink-border">
                 <DropdownMenuItem
                   className="text-red-600"
                   onClick={() => deleteComment.mutate(comment.id)}
@@ -225,7 +225,7 @@ function CommentBubble({
               onClick={() =>
                 toggleReaction.mutate({ commentId: comment.id, emoji })
               }
-              className="text-xs border rounded-full px-1.5 py-0.5 hover:bg-ink-50"
+              className="text-xs border border-ink-border text-ink-text rounded-full px-1.5 py-0.5 hover:bg-ink-50"
             >
               {emoji} {count}
             </button>

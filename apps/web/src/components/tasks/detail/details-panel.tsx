@@ -25,7 +25,7 @@ export function DetailsPanel({
   const updateTask = useUpdateTask(task.id);
 
   return (
-    <div className="border rounded-lg p-3 mb-4">
+    <div className="border rounded-lg p-3 mb-4 border-ink-border">
       <CollapsibleSection
         title="Details"
       >
@@ -38,7 +38,7 @@ export function DetailsPanel({
                 onChange={(statusId) => updateTask.mutate({ statusId })}
               />
             ) : (
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 text-ink-500">
                 <span
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: task.status.color }}
@@ -102,7 +102,7 @@ export function DetailsPanel({
               {isReporter ? (
                 <LabelsSelect taskId={task.id} current={task.labels} />
               ) : (
-                <span className="text-ink-400">
+                <span className="text-ink-500">
                   {task.labels.length || "—"}
                 </span>
               )}

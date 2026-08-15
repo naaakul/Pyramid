@@ -25,7 +25,7 @@ export function TaskProperties({
             </Avatar>
             <span
               key={team.id}
-              className="text-sm rounded-full px-2.5 py-1 font-medium"
+              className="text-sm rounded-full px-2.5 py-1 font-medium text-ink-900"
             >
               {team.name.charAt(0).toUpperCase() + team.name.slice(1)}
             </span>

@@ -26,30 +26,30 @@ export function ProjectEditModal({ project, open, onOpenChange }: { project: Api
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader><DialogTitle>Edit Project</DialogTitle></DialogHeader>
+      <DialogContent className="max-w-sm ring-ink-border">
+        <DialogHeader><DialogTitle className='text-ink-900'>Edit Project</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border-b pb-1.5 text-sm outline-none" placeholder="Project name" />
+          <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border px-3 pb-2 rounded-md border-ink-border placeholder:text-ink-sec text-ink-500 py-1.5 text-sm outline-none" placeholder="Project name" />
           <div className="flex items-center gap-2">
             <Popover>
-              <PopoverTrigger asChild><button className="border rounded-full px-2.5 py-1 text-xs"><PriorityBadge priority={priority} /></button></PopoverTrigger>
-              <PopoverContent className="w-40 p-1">
+              <PopoverTrigger asChild><button className="border border-ink-border rounded-full px-2.5 py-0.5 text-xs"><PriorityBadge priority={priority} /></button></PopoverTrigger>
+              <PopoverContent className="w-40 p-1 border-ink-border">
                 {PRIORITIES.map((p) => (
                   <button key={p} onClick={() => setPriority(p)} className="flex w-full px-2 py-1.5 text-sm hover:bg-ink-50 rounded"><PriorityBadge priority={p} /></button>
                 ))}
               </PopoverContent>
             </Popover>
             <Popover>
-              <PopoverTrigger asChild><button className="border rounded-full px-2.5 py-1 text-xs">{dueDate ? dueDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Due date'}</button></PopoverTrigger>
-              <PopoverContent className="w-auto p-0"><Calendar mode="single" selected={dueDate} onSelect={setDueDate} /></PopoverContent>
+              <PopoverTrigger asChild><button className="border rounded-full border-ink-border text-ink-500 px-2.5 py-1 text-xs">{dueDate ? dueDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Due date'}</button></PopoverTrigger>
+              <PopoverContent className="w-auto p-0 border-ink-border"><Calendar mode="single" selected={dueDate} onSelect={setDueDate} /></PopoverContent>
             </Popover>
           </div>
-          <div className="border-t pt-2">
+          <div className=" pt-2">
             <div className="text-xs text-ink-500 mb-1.5">Members</div>
             <ProjectMembersEditor projectId={project.id} members={project.members ?? []} />
           </div>
         </div>
-        <DialogFooter><Button size="sm" onClick={save} className="bg-ink-900 text-white hover:bg-ink-700">Save</Button></DialogFooter>
+        <DialogFooter className='bg-transparent border-0 pt-0'><Button size="sm" onClick={save} className="bg-ink-900 text-white hover:opacity-60">Save</Button></DialogFooter>
       </DialogContent>
     </Dialog>
   );

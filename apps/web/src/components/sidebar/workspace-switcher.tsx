@@ -52,10 +52,10 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu open={open} onOpenChange={setOpen}>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="outline-0">
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-ink-100 outline-0"
             >
               <Avatar className="h-6 w-6 rounded-full overflow-hidden ml-1">
                 {user.avatarUrl ? (
@@ -75,7 +75,7 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
-            className="w-60 border-ink-border text-ink-900 bg-ink-bg shadow-ink-100"
+            className="w-60 border-ink-border text-ink-900 shadow-ink-100"
           >
             <div className="flex flex-col items-center py-3 mb-1">
               <Avatar className="h-10 w-10 rounded-full mb-2 overflow-hidden">
@@ -98,10 +98,10 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
             <DropdownMenuSeparator />
             <div className="flex flex-col gap-1">
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger className="data-[state=open]:bg-ink-bg hover:bg-ink-bg">
                   <Sun size={14} className="mr-2" /> Change Theme
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="border-ink-border text-ink-900 ">
+                <DropdownMenuSubContent className="ring-ink-border text-ink-900 ">
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
@@ -124,7 +124,7 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
               </DropdownMenuSub>
 
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger className="data-[state=open]:bg-ink-bg hover:bg-ink-bg">
                   <span
                     className="w-3.5 h-3.5 rounded mr-2"
                     style={{
@@ -137,7 +137,7 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
                   />
                   Color Mode
                 </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="border-ink-border text-ink-900">
+                <DropdownMenuSubContent className="border-ink-border text-ink-900 ring-ink-border">
                   {displayOptions.map((opt) => (
                     <DropdownMenuItem
                       key={opt.value}
@@ -149,7 +149,7 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
                     >
                       <span className="flex items-center gap-2">
                         <span
-                          className="w-3.5 h-3.5 rounded border"
+                          className="w-3.5 h-3.5 rounded"
                           style={{ backgroundColor: opt.swatch }}
                         />
                         {opt.label}
@@ -160,8 +160,8 @@ export function WorkspaceSwitcher({ user }: { user: CurrentUser }) {
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
 
-              <DropdownMenuItem asChild>
-                <Link href="/settings/profile" className="flex items-center">
+              <DropdownMenuItem asChild className="hover:bg-ink-bg">
+                <Link href="/settings/profile" className="flex items-center hover:bg-ink-bg">
                   <Settings size={14} className="mr-2" /> Settings
                 </Link>
               </DropdownMenuItem>

@@ -10,19 +10,19 @@ export function StatusSelect({ value, onChange }: { value: ApiStatus; onChange: 
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1.5 text-sm">
+      <DropdownMenuTrigger className="flex items-center gap-1.5 text-sm text-ink-500 outline-0">
         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: value.color }} />
         {value.name}
-        <ChevronDown size={14} className="text-gray-400" />
+        <ChevronDown size={14} className="text-ink-500" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
         {(statuses ?? []).map((s) => (
           <DropdownMenuItem key={s.id} onClick={() => onChange(s.id)} className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 text-ink-500">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
               {s.name}
             </span>
-            {value.id === s.id && <Check size={14} />}
+            {value.id === s.id && <Check size={14} className='text-ink-500' />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

@@ -11,16 +11,16 @@ export function PrioritySelect({ value, onChange }: { value: string; onChange: (
   const [open, setOpen] = useState(false);
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger className="flex items-center gap-1">
+      <DropdownMenuTrigger className="flex items-center gap-1 outline-0">
         <PriorityBadge priority={value} />
-        {open ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+        {open ? <ChevronUp size={14} className="text-ink-500" /> : <ChevronDown size={14} className="text-ink-500" />}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <div className="px-2 py-1 text-xs text-gray-400">Priority</div>
+        <div className="px-2 py-1 text-xs text-ink-500">Priority</div>
         {OPTIONS.map((opt) => (
-          <DropdownMenuItem key={opt} onClick={() => onChange(opt)} className="flex items-center justify-between">
+          <DropdownMenuItem key={opt} onClick={() => onChange(opt)} className="flex items-center justify-between hover:bg-ink-bg">
             <PriorityBadge priority={opt} />
-            {value === opt && <Check size={14} />}
+            {value === opt && <Check size={14} className='text-ink-500' />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

@@ -44,7 +44,7 @@ export function ProjectRow({ project }: { project: ApiProject }) {
   return (
     <>
       <div
-        className={`${GRID} p-3 px-3.5 border-b last:border-b-0 text-sm hover:bg-ink-bg`}
+        className={`${GRID} p-3 px-3.5 border-b border-ink-border text-ink-900 last:border-b-0 text-sm hover:bg-ink-bg`}
       >
         <Link
           href={`/projects/${project.id}`}
@@ -60,13 +60,13 @@ export function ProjectRow({ project }: { project: ApiProject }) {
             <DropdownMenuTrigger className="text-ink-400 hover:text-ink-600 justify-self-end">
               <MoreHorizontal size={16} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setEditOpen(true)}>
+            <DropdownMenuContent align="end" className="ring-ink-border">
+              <DropdownMenuItem onClick={() => setEditOpen(true)} className="text-ink-500">
                 <Pencil size={13} className="mr-2" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="text-red-600"
+                className="text-red-600 hover:bg-ink-bg"
                 onClick={() => setConfirmOpen(true)}
               >
                 <Trash2 size={13} className="mr-2" />

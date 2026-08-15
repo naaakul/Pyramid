@@ -26,7 +26,7 @@ export function TaskDetailHeader({
               localTitle !== task.title &&
               updateTask.mutate({ title: localTitle })
             }
-            className="text-xl font-semibold w-full outline-none focus:bg-ink-50 rounded px-1 -mx-1"
+            className="text-xl font-semibold w-full outline-none focus:bg-ink-50 rounded px-1 -mx-1 text-ink-900"
           />
           <textarea
             value={localDesc}
@@ -41,7 +41,7 @@ export function TaskDetailHeader({
         </>
       ) : (
         <>
-          <h1 className="text-xl font-semibold">{task.title}</h1>
+          <h1 className="text-xl font-semibold text-ink-900">{task.title}</h1>
           {task.description && (
             <p className="text-sm text-ink-500 mt-1 max-w-xl">
               {task.description}

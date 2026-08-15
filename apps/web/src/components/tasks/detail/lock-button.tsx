@@ -26,7 +26,7 @@ export function LockButton({
   return (
     <button
       onClick={toggle}
-      className="w-8 h-8 border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50"
+      className="w-8 h-8 border border-ink-border rounded-md flex items-center justify-center text-ink-500 hover:bg-ink-50"
     >
       {isLocked ? (
         <Lock size={14} className="text-red-500" />

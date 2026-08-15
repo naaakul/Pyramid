@@ -14,7 +14,7 @@ function getInitials(name: string) {
 export function MembersCell({ assignees }: { assignees: { user: ApiUser }[] }) {
   if (assignees.length === 0) {
     return (
-      <button className="w-6 h-6 rounded-full border border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:bg-gray-100">
+      <button className="w-6 h-6 rounded-full border border-dashed border-ink-border flex items-center justify-center text-ink-sec hover:bg-gray-100">
         <Plus size={12} />
       </button>
     );

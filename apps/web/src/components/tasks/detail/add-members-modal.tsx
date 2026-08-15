@@ -63,18 +63,18 @@ export function AddMembersModal({
             : "Add members"}
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm ring-ink-border">
         <DialogHeader>
-          <DialogTitle>Add members</DialogTitle>
+          <DialogTitle className="text-ink-900">Add members</DialogTitle>
         </DialogHeader>
 
-        <div className="flex items-center gap-2 border rounded-md px-2.5 py-1.5">
+        <div className="flex items-center gap-2 border border-ink-border rounded-md px-2.5 py-1.5">
           <Search size={14} className="text-ink-400" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by email..."
-            className="flex-1 text-sm outline-none"
+            className="flex-1 text-sm outline-none placeholder:text-ink-sec text-ink-500"
           />
         </div>
 
@@ -103,7 +103,7 @@ export function AddMembersModal({
                   </AvatarFallback>
                 </Avatar>
                 <span className="flex-1 text-left">
-                  <div>{user.name}</div>
+                  <div className="text-ink-500">{user.name}</div>
                   <div className="text-xs text-ink-400">{user.email}</div>
                 </span>
                 <span className="text-xs text-ink-500">Invite</span>
@@ -113,22 +113,22 @@ export function AddMembersModal({
         )}
 
         {assignees.length > 0 && (
-          <div className="border-t pt-2 mt-1">
+          <div className="p-2 rounded-md border border-ink-border">
             <div className="text-xs text-ink-400 mb-1">On this task</div>
             {assignees.map(({ user }) => (
               <div
                 key={user.id}
-                className="flex items-center justify-between px-1 py-1 text-sm"
+                className="flex items-center justify-between p-2 py-1 text-sm bg-ink-100 rounded-sm"
               >
-                <span className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
+                <span className="flex items-center gap-2 text-ink-500 pb-1">
+                  {/* <Avatar className="h-6 w-6">
                     <AvatarFallback
                       className="text-[10px] text-white"
                       style={{ backgroundColor: user.avatarColor ?? "#9ca3af" }}
                     >
                       {user.name.charAt(0)}
                     </AvatarFallback>
-                  </Avatar>
+                  </Avatar> */}
                   {user.name}
                 </span>
                 <button
@@ -142,8 +142,8 @@ export function AddMembersModal({
           </div>
         )}
 
-        <DialogFooter>
-          <Button size="sm" onClick={() => setOpen(false)}>
+        <DialogFooter className="bg-transparent border-0 pt-0">
+          <Button size="sm" onClick={() => setOpen(false)} className="bg-ink-900 hover:opacity-60">
             Done
           </Button>
         </DialogFooter>

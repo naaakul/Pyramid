@@ -28,7 +28,7 @@ export function ViewModal({
     <Dialog>
       <DialogTrigger asChild>
         <button
-          className={`h-8 px-2 border rounded-md flex items-center gap-1 ${
+          className={`h-8 px-2 border border-ink-border rounded-md flex items-center gap-1 ${
             task.watcherCount > 0 ? "text-blue-500" : "text-ink-500"
           } hover:bg-ink-50 text-xs`}
         >

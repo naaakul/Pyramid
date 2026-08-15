@@ -25,14 +25,15 @@ function EditableField({
   return (
     <div className="flex items-center justify-between py-4 border-b last:border-b-0">
       <div>
-        <div className="text-sm font-medium">{label}</div>
+        <div className="text-sm font-medium text-ink-text">{label}</div>
         {hint && <div className="text-xs text-ink-400">{hint}</div>}
       </div>
       <input
         value={local}
         onChange={(e) => setLocal(e.target.value)}
         onBlur={() => local !== value && onSave(local)}
-        className="bg-ink-50 rounded-md px-3 py-1.5 text-sm text-right outline-none focus:bg-ink-100 w-48"
+        placeholder={"Enter " + label}
+        className="bg-ink-50 rounded-md px-3 py-1.5 text-sm placeholder:text-ink-sec text-ink-text border border-ink-border text-right outline-none w-48"
       />
     </div>
   );
@@ -57,14 +58,14 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto p-8">
-      <h1 className="text-xl font-semibold mb-6">Profile</h1>
+      <h1 className="text-xl font-semibold mb-6 text-ink-900">Profile</h1>
 
-      <div className="border rounded-lg px-4 divide-y">
+      <div className="border border-ink-border rounded-lg px-4 divide-y">
         <button
           onClick={() => setAvatarOpen(true)}
           className="w-full flex items-center justify-between py-4"
         >
-          <span className="text-sm font-medium">Profile picture</span>
+          <span className="text-sm font-medium text-ink-text">Profile picture</span>
           <Avatar className="h-8 w-8 rounded-full overflow-hidden">
             {currentUser.avatarUrl ? (
               <Image
@@ -82,8 +83,8 @@ export default function ProfilePage() {
         </button>
 
         <div className="flex items-center justify-between py-4">
-          <span className="text-sm font-medium">Email</span>
-          <span className="flex items-center gap-2 text-sm text-ink-600">
+          <span className="text-sm font-medium text-ink-text">Email</span>
+          <span className="flex items-center gap-2 text-sm text-ink-text">
             {currentUser.email ?? "—"}
             <button
               onClick={() =>
@@ -120,7 +121,7 @@ export default function ProfilePage() {
       <h2 className="text-sm font-medium text-ink-700 mt-8 mb-2">
         Workspace access
       </h2>
-      <div className="border rounded-lg px-4 py-4 flex items-center justify-between">
+      <div className="border rounded-lg px-4 py-4 flex items-center justify-between border-ink-border">
         <span className="text-sm text-ink-500">
           Remove yourself from the workspace
         </span>
