@@ -40,10 +40,15 @@ export function TasksToolbar({ initialView, projectId }: { initialView: 'list' |
           <FilterMenu />
           <NotificationBell type="task" />
           {canCreateTask && (
-            <Button size="default" className="bg-ink-900 text-white hover:bg-ink-700" onClick={() => openTask({ projectId })}>
-              <Plus/> Add Task
-            </Button>
-          )}
+              <Button
+                size="default"
+                className="bg-ink-900 text-white hover:bg-ink-700 shrink-0 px-3 sm:px-4"
+                onClick={() => openTask({ projectId })}
+              >
+                <Plus className="sm:mr-1" />
+                <span className="hidden sm:inline">Add Task</span>
+              </Button>
+            )}
         </div>
       </div>
       {initialView === 'list' ? (

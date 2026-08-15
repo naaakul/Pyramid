@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { ProjectRow, PROJECT_GRID } from "./project-row";
+import { ProjectRow } from "./project-row";
 import { useProjects } from "@/hooks/use-projects";
 import { useProjectComposerStore } from "@/store/project-composer-store";
 
@@ -21,9 +21,7 @@ export function ProjectTable({ search }: { search?: string }) {
   return (
     <div className="px-6">
       <div className="border border-ink-border rounded-lg overflow-hidden">
-        <div
-          className={`${PROJECT_GRID} p-3.5 bg-ink-bg text-xs text-ink-900 font-medium border-b border-ink-border`}
-        >
+        <div className="hidden md:grid grid-cols-[1fr_140px_140px_140px_50px] items-center gap-2 p-3.5 bg-ink-bg text-xs text-ink-900 font-medium border-b border-ink-border">
           <span>Projects</span>
           <span>Priority</span>
           <span>Lead</span>

@@ -13,28 +13,23 @@ export function TaskProperties({
 }) {
   if (teams.length === 0 && !dueDateEnd) return null;
   return (
-    <div className="flex items-center gap-2 mb-3">
+    <div className="flex items-start gap-2 mb-3 flex-wrap">
       <span className="text-sm text-ink-500 w-24 shrink-0">Properties</span>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
         {teams.map(({ team }) => (
-          <div className="flex items-center ">
+          <div key={team.id} className="flex items-center">
             <Avatar className="h-6 w-6 after:border-none">
               <AvatarFallback className="text-[10px] text-ink-500 bg-ink-100">
                 {team.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span
-              key={team.id}
-              className="text-sm rounded-full px-2.5 py-1 font-medium text-ink-900"
-            >
+            <span className="text-sm rounded-full px-2.5 py-1 font-medium text-ink-900">
               {team.name.charAt(0).toUpperCase() + team.name.slice(1)}
             </span>
           </div>
         ))}
         {dueDateEnd && (
-          <Badge
-            className="gap-1 text-red-500 border-0 bg-red-500/10 text-[11px] px-1.5 py-0 ml-auto"
-          >
+          <Badge className="gap-1 text-red-500 border-0 bg-red-500/10 text-[11px] px-1.5 py-0 sm:ml-auto">
             <Calendar size={11} />
             {new Date(dueDateEnd).toLocaleDateString("en-US", {
               day: "2-digit",

@@ -16,8 +16,6 @@ import { useTaskComposerStore } from "@/store/task-composer-store";
 import { useCurrentUser } from "@/lib/auth/current-user-context";
 import type { ApiTask } from "@/lib/api/tasks";
 
-const GRID = "grid grid-cols-[1fr_120px_100px_120px_50px] items-center gap-2";
-
 function formatDate(d: string | null) {
   if (!d) return "—";
 
@@ -58,9 +56,7 @@ export function SubtasksTable({
 
       {open && (
         <div className="border rounded-lg overflow-hidden border-ink-border">
-          <div
-            className={`${GRID} p-3.5 bg-ink-bg text-xs font-medium text-ink-900 border-b border-ink-border`}
-          >
+          <div className="hidden md:grid grid-cols-[1fr_120px_100px_120px_50px] items-center gap-2 p-3.5 bg-ink-bg text-xs font-medium text-ink-900 border-b border-ink-border">
             <span>Task</span>
             <span>Priority</span>
             <span>Members</span>
@@ -72,48 +68,61 @@ export function SubtasksTable({
             )}
           </div>
 
-          {subtasks.map((task) => (
-            <Link href={`/tasks/${task.id}`} className="truncate">
-              <div
-                key={task.id}
-                className={`${GRID} p-2.5 px-3.5 border-b text-sm items-center border-ink-border hover:bg-ink-bg text-ink-text`}
-              >
-                {isReporter ||
-                task.assignees.some((a) => a.user.id === currentUser.id) ? (
-                  <p>{task.title}</p>
-                ) : (
-                  <span className="truncate text-ink-400">{task.title}</span>
-                )}
+          {subtasks.map((task) => {
+            const canSeeTitle =
+              isReporter ||
+              task.assignees.some((a) => a.user.id === currentUser.id);
 
-                <PriorityBadge priority={task.priority} />
+            const menu = isReporter ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="text-ink-400 hover:text-ink-600 justify-self-end">
+                  <MoreHorizontal size={16} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="ring-ink-border">
+                  <DropdownMenuItem
+                    className="text-red-600 hover:bg-ink-bg hover:text-none"
+                    onClick={() => removeTask.mutate(task.id)}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <span />
+            );
 
-                <MembersCell assignees={task.assignees} />
+            return (
+              <Link key={task.id} href={`/tasks/${task.id}`}>
+                <div className="hidden md:grid grid-cols-[1fr_120px_100px_120px_50px] items-center gap-2 p-2.5 px-3.5 border-b text-sm border-ink-border hover:bg-ink-bg text-ink-text">
+                  {canSeeTitle ? (
+                    <p className="truncate">{task.title}</p>
+                  ) : (
+                    <span className="truncate text-ink-400">
+                      {task.title}
+                    </span>
+                  )}
 
-                <span className="text-ink-600 text-xs">
-                  {formatDate(task.dueDateEnd)}
-                </span>
+                  <PriorityBadge priority={task.priority} />
+                  <MembersCell assignees={task.assignees} />
+                  <span className="text-ink-600 text-xs">
+                    {formatDate(task.dueDateEnd)}
+                  </span>
+                  {menu}
+                </div>
 
-                {isReporter ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="text-ink-400 hover:text-ink-600 justify-self-end">
-                      <MoreHorizontal size={16} />
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end" className="ring-ink-border">
-                      <DropdownMenuItem
-                        className="text-red-600 hover:bg-ink-bg hover:text-none"
-                        onClick={() => removeTask.mutate(task.id)}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <span />
-                )}
-              </div>
-            </Link>
-          ))}
+                <div className="md:hidden flex items-center justify-between gap-2 p-3 px-3.5 border-b text-sm border-ink-border hover:bg-ink-bg text-ink-text">
+                  <span
+                    className={`truncate ${canSeeTitle ? "" : "text-ink-400"}`}
+                  >
+                    {task.title}
+                  </span>
+                  <span className="text-ink-600 text-xs shrink-0">
+                    {formatDate(task.dueDateEnd)}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
 
           {isReporter && (
             <button

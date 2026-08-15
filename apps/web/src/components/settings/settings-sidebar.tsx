@@ -26,19 +26,18 @@ export default function SettingsSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-[16rem] shrink-0 border-r border-ink-border bg-ink-bg flex flex-col">
-      <div className="p-4">
+    <aside className="w-full md:w-[16rem] md:shrink-0 border-b md:border-b-0 md:border-r border-ink-border bg-ink-bg flex flex-col">
+      <div className="p-4 pb-2 md:pb-4">
         <Link
           href="/tasks"
-          className="flex items-center gap-2 text-sm text-ink-900 hover:text-ink-900 mb-4"
+          className="flex items-center gap-2 text-sm text-ink-900 hover:text-ink-900 mb-2 md:mb-4"
         >
           <ArrowLeft size={16} />
-          
           Back to app
         </Link>
       </div>
 
-      <nav className="px-2 space-y-1">
+      <nav className="flex md:flex-col gap-1 px-2 pb-2 md:pb-0 overflow-x-auto md:overflow-visible">
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
 
@@ -46,10 +45,8 @@ export default function SettingsSidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-ink-900 text-sm ${
-                active
-                  ? "bg-ink-100 font-medium"
-                  : "hover:bg-ink-100"
+              className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-ink-900 text-sm whitespace-nowrap shrink-0 md:shrink ${
+                active ? "bg-ink-100 font-medium" : "hover:bg-ink-100"
               }`}
             >
               <Icon size={16} />

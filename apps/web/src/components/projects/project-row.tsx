@@ -32,7 +32,6 @@ function formatDate(d: string | null) {
     year: "numeric",
   });
 }
-const GRID = "grid grid-cols-[1fr_140px_140px_140px_50px] items-center gap-2";
 
 export function ProjectRow({ project }: { project: ApiProject }) {
   const currentUser = useCurrentUser();
@@ -41,43 +40,56 @@ export function ProjectRow({ project }: { project: ApiProject }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const removeProject = useRemoveProject();
 
+  const actionsMenu = isLead ? (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="text-ink-400 hover:text-ink-600 justify-self-end">
+        <MoreHorizontal size={16} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="ring-ink-border">
+        <DropdownMenuItem
+          onClick={() => setEditOpen(true)}
+          className="text-ink-500"
+        >
+          <Pencil size={13} className="mr-2" />
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="text-red-600 hover:bg-ink-bg"
+          onClick={() => setConfirmOpen(true)}
+        >
+          <Trash2 size={13} className="mr-2" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ) : (
+    <span />
+  );
+
   return (
     <>
-      <div
-        className={`${GRID} p-3 px-3.5 border-b border-ink-border text-ink-900 last:border-b-0 text-sm hover:bg-ink-bg`}
-      >
-        <Link
-          href={`/projects/${project.id}`}
-          className="truncate"
-        >
+      {/* Desktop / tablet: full grid row */}
+      <div className="hidden md:grid grid-cols-[1fr_140px_140px_140px_50px] items-center gap-2 p-3 px-3.5 border-b border-ink-border text-ink-900 last:border-b-0 text-sm hover:bg-ink-bg">
+        <Link href={`/projects/${project.id}`} className="truncate">
           {project.name}
         </Link>
         <PriorityBadge priority={project.priority} />
         <span className="text-ink-600">{project.lead?.name ?? "—"}</span>
         <span className="text-ink-600">{formatDate(project.dueDate)}</span>
-        {isLead ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="text-ink-400 hover:text-ink-600 justify-self-end">
-              <MoreHorizontal size={16} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="ring-ink-border">
-              <DropdownMenuItem onClick={() => setEditOpen(true)} className="text-ink-500">
-                <Pencil size={13} className="mr-2" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-red-600 hover:bg-ink-bg"
-                onClick={() => setConfirmOpen(true)}
-              >
-                <Trash2 size={13} className="mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <span />
-        )}
+        {actionsMenu}
       </div>
+
+      {/* Mobile: name + due date only */}
+      <div className="md:hidden flex items-center justify-between gap-2 p-3 px-3.5 border-b border-ink-border text-ink-900 last:border-b-0 text-sm hover:bg-ink-bg">
+        <Link href={`/projects/${project.id}`} className="truncate flex-1">
+          {project.name}
+        </Link>
+        <span className="text-xs text-ink-600 shrink-0">
+          {formatDate(project.dueDate)}
+        </span>
+        {isLead && actionsMenu}
+      </div>
+
       {isLead && (
         <ProjectEditModal
           project={project}
@@ -109,4 +121,3 @@ export function ProjectRow({ project }: { project: ApiProject }) {
     </>
   );
 }
-export { GRID as PROJECT_GRID };

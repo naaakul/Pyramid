@@ -55,7 +55,7 @@ export function TaskDetailActions({
   }
 
   return (
-    <div className="flex items-center gap-2 shrink-0">
+    <div className="flex items-center gap-2 flex-wrap shrink-0">
       {!isSubtask && isReporter && (
         <LockButton taskId={task.id} isLocked={task.isLocked} />
       )}
@@ -76,9 +76,10 @@ export function TaskDetailActions({
           </DropdownMenuContent>
         </DropdownMenu>
       )}
+
       <button
         onClick={togglePanel}
-        className="w-8 h-8 bg-ink-100 rounded-md flex items-center justify-center text-ink-600 hover:bg-ink-100/70"
+        className="hidden lg:flex w-8 h-8 bg-ink-100 rounded-md items-center justify-center text-ink-600 hover:bg-ink-100/70"
       >
         <PanelRight size={14} />
       </button>

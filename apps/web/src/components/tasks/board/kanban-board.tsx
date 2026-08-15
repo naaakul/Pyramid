@@ -26,8 +26,6 @@ export function KanbanBoard({ query, projectId, canCreateTask = true }: { query:
   const [orderedIds, setOrderedIds] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Sync local order with fetched statuses: keep existing order,
-  // append any newly-seen statuses at the end.
   useEffect(() => {
     if (!statuses?.length) return;
     setOrderedIds((prev) => {
@@ -73,7 +71,7 @@ export function KanbanBoard({ query, projectId, canCreateTask = true }: { query:
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-      <SortableContext items={orderedIds} strategy={horizontalListSortingStrategy}>
+      <SortableContext items={orderedIds} strategy={horizontalListSortingStrategy} >
         <div className="flex gap-4 w-full overflow-x-auto p-6 pt-0 md:overflow-x-visible">
           {orderedStatuses.map((status) => (
             <KanbanColumn

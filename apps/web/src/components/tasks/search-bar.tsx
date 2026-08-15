@@ -27,14 +27,14 @@ export function SearchBar({
 
   if (!expanded) {
     return (
-      <Button variant="outline" size="icon" onClick={() => setExpanded(true)} className="border-ink-border text-ink-900 hover:bg-ink-bg hover:text-none">
+      <Button variant="outline" size="icon" onClick={() => setExpanded(true)} className="border-ink-border hidden sm:flex text-ink-900 hover:bg-ink-bg hover:text-none">
         <Search size={16} />
       </Button>
     );
   }
 
   return (
-    <div className="flex items-center gap-2 border rounded-md px-3 h-9 w-64 bg-white border-ink-border text-ink-900">
+    <div className="hidden sm:flex items-center gap-2 h-9 w-64 rounded-md border border-ink-border bg-white px-3 text-ink-900">
       <Search size={16} className="shrink-0" />
       <input
         ref={inputRef}

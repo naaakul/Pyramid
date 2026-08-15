@@ -41,14 +41,17 @@ export function TaskDetailClient({
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <TaskBreadcrumb task={task} />
 
-      <div className="flex gap-6 items-start">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        <div className="flex-1 min-w-0 w-full">
+          <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
             <TaskDetailHeader task={task} isReporter={isReporter} />
-            {!panelOpen && actions}
+
+            <div className="flex lg:hidden">{actions}</div>
+
+            {!panelOpen && <div className="hidden lg:flex">{actions}</div>}
           </div>
 
           {!isSubtask && (
@@ -82,18 +85,24 @@ export function TaskDetailClient({
           />
         </div>
 
-        {panelOpen && (
-          <div className="w-72 shrink-0 sticky top-6">
-            <div className="flex justify-end gap-2 mb-4">{actions}</div>
-            <DetailsPanel
-              task={task}
-              isReporter={isReporter}
-              isSubtask={isSubtask}
-              isProjectTask={isProjectTask}
-            />
-            {!isSubtask && <UpdatesPanel activities={task.activities} />}
-          </div>
-        )}
+        <div
+          className={`w-full lg:w-72 lg:shrink-0 lg:sticky lg:top-6 ${
+            panelOpen ? "" : "lg:hidden"
+          }`}
+        >
+          {panelOpen && (
+            <div className="hidden lg:flex justify-end gap-2 mb-4">
+              {actions}
+            </div>
+          )}
+          <DetailsPanel
+            task={task}
+            isReporter={isReporter}
+            isSubtask={isSubtask}
+            isProjectTask={isProjectTask}
+          />
+          {!isSubtask && <UpdatesPanel activities={task.activities} />}
+        </div>
       </div>
     </div>
   );

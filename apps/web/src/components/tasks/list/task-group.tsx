@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ChevronDown, Plus } from 'lucide-react';
-import { TaskRow } from './task-row';
-import type { ColumnDef } from '../shared/column-defs';
-import type { ApiStatus, ApiTask } from '@/lib/api/tasks';
-import { useTaskComposerStore } from '@/store/task-composer-store';
+import { useState } from "react";
+import { ChevronDown, Plus } from "lucide-react";
+import { TaskRow } from "./task-row";
+import type { ColumnDef } from "../shared/column-defs";
+import type { ApiStatus, ApiTask } from "@/lib/api/tasks";
+import { useTaskComposerStore } from "@/store/task-composer-store";
 
 export function TaskGroup({
   status,
@@ -21,7 +21,7 @@ export function TaskGroup({
   canCreateTask?: boolean;
 }) {
   const [open, setOpen] = useState(true);
-  const gridTemplate = `1fr ${columns.map((c) => c.width).join(' ')} 50px`;
+  const gridTemplate = `1fr ${columns.map((c) => c.width).join(" ")} 50px`;
   const openTask = useTaskComposerStore((s) => s.openTask);
 
   return (
@@ -32,7 +32,7 @@ export function TaskGroup({
       >
         <ChevronDown
           size={16}
-          className={`transition-transform ${open ? '' : '-rotate-90'}`}
+          className={`transition-transform ${open ? "" : "-rotate-90"}`}
         />
         {status.name}
       </button>
@@ -40,18 +40,15 @@ export function TaskGroup({
       {open && (
         <div className="border rounded-lg overflow-hidden border-ink-border">
           <div
-            className="grid gap-2 p-3.5 bg-ink-bg text-xs text-ink-900 font-medium border-b border-ink-border"
+            className="hidden md:grid gap-2 p-3.5 bg-ink-bg text-xs text-ink-900 font-medium border-b border-ink-border"
             style={{ gridTemplateColumns: gridTemplate }}
           >
             <span>Task</span>
-
             {columns.map((col) => (
               <span key={col.key}>{col.label}</span>
             ))}
-
             <span className="justify-self-end">Actions</span>
           </div>
-
           {tasks.map((task) => (
             <TaskRow
               key={task.id}

@@ -69,9 +69,9 @@ export function TaskResources({
 
   return (
     <div className="mb-3">
-      <div className="flex items-center gap-2">
+      <div className="flex items-start gap-2 flex-wrap">
         <span className="text-sm text-ink-500 w-24 shrink-0">Resources</span>
-        <div className="flex flex-wrap gap-1.5 items-center">
+        <div className="flex flex-wrap gap-1.5 items-center flex-1 min-w-0">
           {attachments.map((a) => (
             <span
               key={a.id}

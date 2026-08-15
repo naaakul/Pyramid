@@ -105,12 +105,12 @@ function Composer({
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder={placeholder}
-          className="flex-1 text-sm outline-none placeholder:text-ink-400 text-ink-900"
+          className="flex-1 min-w-0 text-sm outline-none placeholder:text-ink-400 text-ink-900"
         />
         <button
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          className="text-ink-400 hover:text-ink-600"
+          className="text-ink-400 hover:text-ink-600 shrink-0"
         >
           <Paperclip size={16} />
         </button>
@@ -121,7 +121,7 @@ function Composer({
           className="hidden"
           onChange={handleFile}
         />
-        <button onClick={submit} className="text-ink-400 hover:text-ink-600">
+        <button onClick={submit} className="text-ink-400 hover:text-ink-600 shrink-0">
           <Send size={16} />
         </button>
       </div>
@@ -154,9 +154,9 @@ function CommentBubble({
 
   return (
     <div className="mb-3">
-      <div className="flex items-start justify-between mb-1">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
+      <div className="flex items-start justify-between gap-2 mb-1">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar className="h-6 w-6 shrink-0">
             <AvatarFallback
               className="text-[10px] text-white"
               style={{
@@ -166,12 +166,12 @@ function CommentBubble({
               {comment.author.name.charAt(0)}
             </AvatarFallback>
           </Avatar>
-          <UserLabel user={comment.author} showAvatar={false}/>
-          <span className="text-xs text-ink-400">
+          <UserLabel user={comment.author} showAvatar={false} />
+          <span className="text-xs text-ink-400 whitespace-nowrap">
             {timeAgo(comment.createdAt)}
           </span>
         </div>
-        <div className="flex items-center gap-1 text-ink-400">
+        <div className="flex items-center gap-1 text-ink-400 shrink-0">
           <Popover>
             <PopoverTrigger asChild>
               <button className="hover:text-ink-600">
@@ -209,16 +209,18 @@ function CommentBubble({
           )}
         </div>
       </div>
-      <p className="text-sm text-ink-700 pl-8">{comment.body}</p>
+      <p className="text-sm text-ink-700 pl-6 sm:pl-8 break-words">
+        {comment.body}
+      </p>
       {comment.imageUrl && (
         <img
           src={comment.imageUrl}
-          className="mt-1 ml-8 max-w-[160px] rounded border"
+          className="mt-1 ml-6 sm:ml-8 max-w-[160px] rounded border"
           alt="attachment"
         />
       )}
       {Object.keys(grouped).length > 0 && (
-        <div className="flex gap-1 mt-1 ml-8">
+        <div className="flex flex-wrap gap-1 mt-1 ml-6 sm:ml-8">
           {Object.entries(grouped).map(([emoji, count]) => (
             <button
               key={emoji}
@@ -235,13 +237,13 @@ function CommentBubble({
       {canReply && (
         <button
           onClick={() => setReplying((v) => !v)}
-          className="text-xs text-ink-400 hover:text-ink-600 ml-8 mt-1"
+          className="text-xs text-ink-400 hover:text-ink-600 ml-6 sm:ml-8 mt-1"
         >
           Reply
         </button>
       )}
       {replying && (
-        <div className="ml-8 mt-2">
+        <div className="ml-6 sm:ml-8 mt-2">
           <Composer
             placeholder="Reply..."
             onSubmit={(body, imageUrl) => {
@@ -256,7 +258,7 @@ function CommentBubble({
         </div>
       )}
       {(comment.replies?.length ?? 0) > 0 && (
-        <div className="ml-8 mt-2 border-l pl-3 space-y-3">
+        <div className="ml-6 sm:ml-8 mt-2 border-l pl-3 space-y-3">
           {(comment.replies ?? []).map((reply) => (
             <CommentBubble
               key={reply.id}

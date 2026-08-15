@@ -8,7 +8,7 @@ export default function SettingsLayout({
 }) {
   return (
     <AuthenticatedLayout>
-      <div className="flex h-screen">
+      <div className="flex flex-col md:flex-row h-screen overflow-y-auto md:overflow-hidden">
         <SettingsSidebar />
 
         <main className="flex-1 overflow-y-auto">
