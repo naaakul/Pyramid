@@ -11,8 +11,9 @@ interface AuthUser {
 
 const COOKIE_OPTS = {
   httpOnly: true,
-  sameSite: process.env.NODE_ENV === 'production' ? ('none' as const) : ('lax' as const),
-  secure: process.env.NODE_ENV === 'production',
+  domain: process.env.COOKIE_DOMAIN,
+  sameSite: 'lax' as const,
+  secure: true,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
